@@ -1,7 +1,6 @@
 package acsse.csc3a.imagegraph;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-
 import acsse.csc31.graph.AdjacencyMapGraph;
 import acsse.csc31.graph.Edge;
 import acsse.csc31.graph.Graph;
@@ -26,44 +25,45 @@ public class ImageGraph {
         int width = image.getWidth();
         int height = image.getHeight();
 
-        /*
-         *  create vertices
-         */
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                Point p = new Point(x, y);
-                Vertex<Point> v = graph.insertVertex(p);
-                pixelVertices.put(p, v);
-            }
-        }
+        @SuppressWarnings("unchecked")
+		Vertex<Point>[][] vertexGrid = new Vertex[height][width];
+        int[][] rgbGrid = new int[height][width];
 
         /*
          * Create edges
          */
-        int[][] directions = { {0,1}, {1,0}, {-1,0}, {0,-1} }; 
+        /*
+         * Only two directions (right and down) are used to prevent inserting the same edge twice.
+         * Each pixel connects to its neighbors,
+         * and as long as each pixel is connected to its right and bottom neighbors, 
+         * the graph will still be fully connected for 4-directional adjacency
+         */
+        int[][] directions = { {-1, 0}, {0, -1} /*,{-1,0}, {0,-1}*/}; // left, top
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                Point p1 = new Point(x, y);
-                Vertex<Point> v1 = pixelVertices.get(p1);
-                int rgb1 = image.getRGB(x, y);
+                Point p = new Point(x, y);
+                int rgb = image.getRGB(x, y);
+                Vertex<Point> v = graph.insertVertex(p);
 
+                vertexGrid[y][x] = v;
+                rgbGrid[y][x] = rgb;
+//                pixelVertices.put(p, v);
+
+                // Check only previously visited neighbors to avoid duplication
                 for (int[] d : directions) {
                     int nx = x + d[0];
                     int ny = y + d[1];
-                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                        Point p2 = new Point(nx, ny);
-                        Vertex<Point> v2 = pixelVertices.get(p2);
-                        int rgb2 = image.getRGB(nx, ny);
-                        double weight = colorDifference(rgb1, rgb2);
 
-                        if (graph.getEdge(v1, v2) == null) {
-                            graph.insertEdge(v1, v2, weight);
-                        }
+                    if (nx >= 0 && ny >= 0) {
+                        Vertex<Point> neighbor = vertexGrid[ny][nx];
+                        int neighborRgb = rgbGrid[ny][nx];
+                        double weight = colorDifference(rgb, neighborRgb);
+                        graph.insertEdge(v, neighbor, weight);
                     }
                 }
             }
         }
-        
     }
 
     private double colorDifference(int rgb1, int rgb2) {
@@ -79,8 +79,14 @@ public class ImageGraph {
         return graph;
     }
 
+    /*
+     * to give a point and get a vertex is trivial caz for the main graph a point is a vertex either way,
+     * and we can use that point in the real graph composit to hold edges (double wight value)
+     */
+    // the vertex is the point (which we use to get edges) we do not need this method caz with the point, we can use that as a key for the main graph
     public Vertex<Point> getVertex(Point p) {
         return pixelVertices.get(p);
+//    	return graph.;
     }
     
     public void printGraph() {

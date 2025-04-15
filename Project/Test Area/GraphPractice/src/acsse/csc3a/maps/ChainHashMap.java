@@ -19,6 +19,7 @@ public class ChainHashMap<K, V> extends AbstractHashMap<K,V> {
 	}
 	
 	//creates an empty table
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void createTable() {
 		table = (UnsortedTableMap<K,V>[]) new UnsortedTableMap[capacity];

@@ -15,21 +15,29 @@ public class Main {
 	public static void main(String[] args) {
 		BufferedImage img;
 		try {
-			img = ImageIO.read(new File("C:\\Users\\sinqo\\Desktop\\Practice01_Maps\\IMG_6145.jpg"));
+			img = ImageIO.read(new File("IMG_6145.jpg"));
 			ImageGraph imageGraph = new ImageGraph(img);
 
 			Graph<Point, Double> g = imageGraph.getGraph();
 
+			Iterable<Vertex<Point>> verticies = g.vertices();
+			
+			for (Vertex<Point> vertex : verticies) {
+				System.out.println(vertex.getElement());
+			}
+			
+			
+			
 			// Now you can do graph operations like:
-			Vertex<Point> a = imageGraph.getVertex(new Point(0, 0));
+			/*Vertex<Point> a = imageGraph.getVertex(new Point(0, 0));
 			Vertex<Point> b = imageGraph.getVertex(new Point(10, 10));
 
 			Edge<Double> edge = g.getEdge(a, b);
 			if (edge != null) {
 			    System.out.println("Edge weight: " + edge.getElement());
-			}
+			}*/
 			
-			imageGraph.printGraph();
+//			imageGraph.printGraph();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

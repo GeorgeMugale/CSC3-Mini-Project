@@ -99,7 +99,7 @@ public abstract class AbstractMap<K, V> {
 	public V put(K key, V value) {
 		// if the number of entries in the table more than half the capacity of the table 
 	    if (n >= capacity / 2)  // Check before insertion to be more optimal
-	        resize(2 * capacity - 1);  // Resize if needed
+	        resize(2 * capacity - 1);  // Resize if needed (Load factor threshold = 0.5)
 	    
 	    return bucketPut(hashValue(key), key, value);  // Insert into resized table
 	}

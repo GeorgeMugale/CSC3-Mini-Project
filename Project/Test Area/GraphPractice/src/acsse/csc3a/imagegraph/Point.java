@@ -22,4 +22,10 @@ public class Point {
     public int hashCode() {
         return Objects.hash(x, y);
     }
+    
+    @Override
+    public String toString() {
+    	// TODO Auto-generated method stub
+    	return String.format("x: %s y: %s", x, y);
+    }
 }
