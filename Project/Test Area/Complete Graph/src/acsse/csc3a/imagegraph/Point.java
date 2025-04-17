@@ -29,29 +29,23 @@ public class Point {
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+    	// Combines coordinates with different weights effectively voiding simple
+   		// patterns
+    	long key = x * 0x4F1BBCDC + y * 0x31415927; // Two large primes
+   		// XORs the original hash with its right-shifted 32-bit version
+   		return (int) (key ^ (key >>> 32));
     }
     
+    /**
+   	 * Specialized function designed to convert 2D vertex coordinates (x, y)
+   	 * into a well-distributed integer key so it may be used in the hash function.
+   	 * 
+   	 * @return
+   	 */
     @Override
     public String toString() {
     	// TODO Auto-generated method stub
     	return String.format("x: %s y: %s", x, y);
     }
-
-    /**
-   	 * Specialized function designed to convert 2D vertex coordinates (x, y)
-   	 * into a well-distributed integer key so it may be used in the hash function.
-   	 * 
-   	 * @param x the x coordinate of the vertex
-   	 * @param y the y coordinate of the vertex
-   	 * @return
-   	 */
-   	public int generateKey() {
-   		// Combines coordinates with different weights effectively voiding simple
-   		// patterns
-   		long key = x * 0x4F1BBCDC + y * 0x31415927; // Two large primes
-   		// XORs the original hash with its right-shifted 32-bit version
-   		return (int) (key ^ (key >>> 32));
-   	}
 	
 }

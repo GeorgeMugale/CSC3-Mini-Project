@@ -9,12 +9,12 @@ public class ImageGraph {
 	
     private BufferedImage image;
     private Graph<Point, Double> graph;
-    private Map<Integer, Vertex<Point>> pixelVertices;
+    private Map<Point, Vertex<Point>> pixelVertices;
 
     public ImageGraph(BufferedImage image) {
         this.image = image;
         this.graph = new AdjacencyMapGraph<>();
-        this.pixelVertices = (Map<Integer, Vertex<Point>>)new AdjacencyMap<Integer, Vertex<Point>>();
+        this.pixelVertices = (Map<Point, Vertex<Point>>)new AdjacencyMap<Point, Vertex<Point>>();
         buildGraphFromImage();
     }
 
@@ -44,7 +44,7 @@ public class ImageGraph {
 
                 vertexGrid[y][x] = v;
                 rgbGrid[y][x] = rgb;
-                pixelVertices.put(p.generateKey(), v);
+                pixelVertices.put(p, v);
 
                 // Check only previously visited neighbors to avoid duplication
                 for (int[] d : directions) {
@@ -86,7 +86,7 @@ public class ImageGraph {
      */
     // the vertex is the point (which we use to get edges) we do not need this method caz with the point, we can use that as a key for the main graph
     public Vertex<Point> getVertex(Point p) {
-        return pixelVertices.get(p.generateKey());
+        return pixelVertices.get(p);
 //    	return graph.;
     }
     
