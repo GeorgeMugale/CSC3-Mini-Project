@@ -61,7 +61,7 @@ public class LinkedPositionalList<E> implements PositionalList<E>{
 	}
 
 	@Override
-	public boolean isEmpthy() {
+	public boolean isEmpty() {
 		return size() == 0;
 	}
 

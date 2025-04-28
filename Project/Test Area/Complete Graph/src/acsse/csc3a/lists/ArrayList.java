@@ -1,6 +1,10 @@
 package acsse.csc3a.lists;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class ArrayList<T> implements List<T>, Iterable<T> {
 
@@ -15,7 +19,7 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	public ArrayList() {
 		this('A', 5);
 	}
-	
+
 	/**
 	 * @param n
 	 */
@@ -23,7 +27,7 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 		// TODO Auto-generated constructor stub
 		this('A', arrayLength);
 	}
-	
+
 	/**
 	 * @param n
 	 */
@@ -36,8 +40,8 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	 * The overloaded constructor for creating an ArrayList
 	 */
 	public ArrayList(char strategy, int arrayLength) {
-		
-		this.strategy = (strategy!= 'A' && strategy != 'B') ? strategy : 'A';
+
+		this.strategy = (strategy != 'A' && strategy != 'B') ? strategy : 'A';
 		this.arrayLength = arrayLength;
 		this.data = createArray(this.arrayLength);
 		this.size = 0;
@@ -59,7 +63,7 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	 * @param the index to retrieve from
 	 */
 	@Override
-	public T get(Integer index) {
+	public T get(int index) {
 		try {
 			checkIndex(index, size);
 		} catch (ArrayListException e) {
@@ -74,13 +78,16 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	 * @param The index and he element
 	 */
 	@Override
-	public void set(Integer i, T e) {
+	public T set(int i, T e) {
 		try {
 			checkIndex(i, size);
 		} catch (ArrayListException e1) {
 			e1.printStackTrace();
 		}
+		T temp = data[i];
 		data[i] = e;
+		
+		return temp;
 	}
 
 	/*
@@ -89,7 +96,7 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	 * @param the index for where the new element needs to be added and the element
 	 */
 	@Override
-	public void add(Integer i, T e) {
+	public void add(int i, T e) {
 		try {
 			checkIndex(i, size + 1);
 		} catch (ArrayListException e1) {
@@ -103,6 +110,15 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 		size++;
 	}
 
+	@Override
+	public boolean add(T e) {
+		if (size == arrayLength) {
+			expandArray();
+		}
+		data[size++] = e;
+		return true;
+	}
+
 	/*
 	 * The method for removing an element from the arrayList
 	 * 
@@ -110,7 +126,7 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	 * 
 	 */
 	@Override
-	public T remove(Integer i) {
+	public T remove(int i) {
 		try {
 			checkIndex(i, size);
 		} catch (ArrayListException e) {
@@ -123,12 +139,23 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 		size--;
 		return toShow;
 	}
+	
+	@Override
+    public boolean remove(Object o) {
+        for (int i = 0; i < size; i++) {
+            if (o == null ? data[i] == null : o.equals(data[i])) {
+                remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
 
 	/*
 	 * The auxiliary method to determine the size of the ArrayList
 	 */
 	@Override
-	public Integer size() {
+	public int size() {
 		return size;
 	}
 
@@ -143,6 +170,7 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 	/*
 	 * The overridden toString method
 	 */
+	@Override
 	public String toString() {
 		String str = "[";
 		for (int i = 0; i < size - 1; i++) {
@@ -173,6 +201,24 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 		T[] newData = createArray(newSize);
 		System.arraycopy(data, 0, newData, 0, this.size);
 	}
+	
+	@Override
+    public List<T> subList(int fromIndex, int toIndex) {
+        try {
+            checkIndex(fromIndex, size);
+            checkIndex(toIndex, size + 1);
+        } catch (ArrayListException e) {
+            e.printStackTrace();
+        }
+        if (fromIndex > toIndex) {
+            throw new IllegalArgumentException("fromIndex > toIndex");
+        }
+        
+        ArrayList<T> sublist = new ArrayList<>(toIndex - fromIndex);
+        System.arraycopy(data, fromIndex, sublist.data, 0, toIndex - fromIndex);
+        sublist.size = toIndex - fromIndex;
+        return sublist;
+    }
 
 	/*
 	 * A method for shifting all the elements up by one to the right
@@ -184,6 +230,16 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 			this.data[i + 1] = this.data[i];
 		}
 	}
+	
+	@Override
+    public int lastIndexOf(Object o) {
+        for (int i = size - 1; i >= 0; i--) {
+            if (o == null ? data[i] == null : o.equals(data[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
 	/*
 	 * A method for shifting all the elements up by one to the left
@@ -227,6 +283,81 @@ public class ArrayList<T> implements List<T>, Iterable<T> {
 			return data[current++];
 		}
 
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		for (int i = 0; i < size; i++) {
+			if (o == null ? data[i] == null : o.equals(data[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public Object[] toArray() {
+		return Arrays.copyOf(data, size);
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends T> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean addAll(int index, Collection<? extends T> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int indexOf(Object o) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public ListIterator<T> listIterator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ListIterator<T> listIterator(int index) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

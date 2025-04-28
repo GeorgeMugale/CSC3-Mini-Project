@@ -3,7 +3,7 @@ package acsse.csc3a.lists;
 
 public interface PositionalList<E> extends Iterable<E>{
 	int size();
-	boolean isEmpthy();
+	boolean isEmpty();
 	Position<E> first();
 	Position<E> last();
 	Position<E> before(Position<E> p) throws IllegalArgumentException;
