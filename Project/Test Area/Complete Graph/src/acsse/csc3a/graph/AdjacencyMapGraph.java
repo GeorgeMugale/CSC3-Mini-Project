@@ -136,7 +136,7 @@ public class AdjacencyMapGraph<V, E> implements Graph<V, E> {
 		} else if (endpoints[1] == v) {
 			return endpoints[0];
 		} else {
-			throw new IllegalArgumentException("visnotincidenttothisedge");
+			throw new IllegalArgumentException("v is not incident to this edge");
 		}
 	}
 
