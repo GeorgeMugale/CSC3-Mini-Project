@@ -1,0 +1,43 @@
+.root {
+    -fx-font-family: "Arial";
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Thicker scroll bar */
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10px; /* Increased from 6px */
+    -fx-opacity: 0; /* Hidden by default */
+    -fx-padding: 2;
+    -fx-background-insets: 0;
+}
+
+/* Thumb style */
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #888;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+/* Show scrollbar only when hovering over the scroll pane itself */
+.scroll-pane:hover .scroll-bar:vertical {
+    -fx-opacity: 1;
+}
+
+/* Slightly darker thumb on hover */
+.scroll-pane:hover .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #555;
+}
