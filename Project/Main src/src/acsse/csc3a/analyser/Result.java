@@ -3,7 +3,6 @@ package acsse.csc3a.analyser;
 import acsse.csc3a.graph.algorithms.CATEGORY_TYPE;
 import acsse.csc3a.graph.algorithms.MATCH_TYPE;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 public class Result {
 	public CATEGORY_TYPE category_TYPE = CATEGORY_TYPE.ONLY_WATER_TOP_VIEW;
@@ -75,10 +74,10 @@ public class Result {
 		return result;
 	}
 
-	public Paint textColour() {
+	public Color textColour() {
 		// TODO Auto-generated method stub
 		
-		Paint textFill;
+		Color textFill;
 		
 		switch (match_TYPE) {
 		case GREEN: {

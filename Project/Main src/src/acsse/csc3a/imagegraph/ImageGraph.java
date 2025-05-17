@@ -8,13 +8,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import acsse.csc3a.map.Map;
-import acsse.csc3a.observer.Result;
 import acsse.csc3a.graph.*;
 import acsse.csc3a.graph.algorithms.CATEGORY_TYPE;
 import acsse.csc3a.graph.algorithms.MATCH_TYPE;
 import acsse.csc3a.graph.algorithms.MSTFeatures;
 import acsse.csc3a.map.AbstractMap;
 import acsse.csc3a.map.AdjacencyMap;
+
 
 public class ImageGraph implements Serializable {
 

@@ -3,7 +3,7 @@ import javafx.scene.Scene;
 import javafx.stage.*;
 
 import acsse.csc3a.gui.WaterQualityPane;
-import acsse.csc3a.observer.ImageAnalyser;
+import acsse.csc3a.analyser.ImageAnalyser;
 
 public class Main extends Application {
 

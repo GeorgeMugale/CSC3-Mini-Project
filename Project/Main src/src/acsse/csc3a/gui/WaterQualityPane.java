@@ -3,8 +3,8 @@ package acsse.csc3a.gui;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import acsse.csc3a.observer.AbstractObserver;
-import acsse.csc3a.observer.Result;
+import acsse.csc3a.analyser.AbstractObserver;
+import acsse.csc3a.analyser.Result;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -37,6 +37,7 @@ import javafx.scene.transform.Scale;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 
 public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
@@ -279,5 +280,5 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 		this.labelResults.setTextFill(result.textColour());
 	}
-
+	
 }

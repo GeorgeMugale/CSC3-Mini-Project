@@ -1,19 +1,9 @@
 package acsse.csc3a.graph.algorithms;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-
 import acsse.csc3a.graph.algorithms.MSTFeatures.Distance;
-import acsse.csc3a.graph.algorithms.MSTFeatures.MSTNormalizer;
 import acsse.csc3a.imagegraph.ImageGraph;
 import acsse.csc3a.imagegraph.Point;
 import acsse.csc3a.io.ImageIterator;
