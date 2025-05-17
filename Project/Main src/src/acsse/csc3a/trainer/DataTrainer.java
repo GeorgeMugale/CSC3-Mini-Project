@@ -30,13 +30,11 @@ public class DataTrainer {
 	 * 
 	 * @param category_TYPE - the category of reference data images being analyzed
 	 */
-	public void preComputeMSTs(CATEGORY_TYPE category_TYPE) {
+	public static void preComputeMSTs(CATEGORY_TYPE category_TYPE) {
 
 		try {
 
-			File imageDir = new File(
-					"C:\\Users\\GEORGE MUGALE\\Desktop\\CS3 Mini Project\\Project\\Main src\\data\\reference-data"
-							+ category_TYPE.toString());
+			File imageDir = new File("data\\reference-data\\" + category_TYPE.toString());
 			Map<String, MSTFeatures> mstMap = new AdjacencyMap<>();
 			Prims_MST<Point> mstcalc = new Prims_MST<>();
 
@@ -112,8 +110,7 @@ public class DataTrainer {
 			}
 
 			File outFile = new File(
-					"C:\\Users\\GEORGE MUGALE\\Desktop\\CS3 Mini Project\\Project\\Main src\\data\\reference-data\\"
-							+ category_TYPE.toString() + "\\precomputed-mst-features.dat");
+					"data\\reference-data\\" + category_TYPE.toString() + "\\precomputed-mst-features.dat");
 
 			try (FileOutputStream fos = new FileOutputStream(outFile);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
@@ -142,7 +139,7 @@ public class DataTrainer {
 	 * After this the static mean and standard deviation values of the MSTFeature
 	 * class can be updated to reflect the new global state of mst features
 	 */
-	public void calcMeansAndStdDevs() {
+	public static void calcMeansAndStdDevs() {
 
 		try (ImageIterator iterator = new ImageIterator();) {
 
@@ -170,7 +167,7 @@ public class DataTrainer {
 	 *      current reference data set
 	 * @param category_TYPE specified category
 	 */
-	public void normalizePrecomputedMSTFeatures(CATEGORY_TYPE category_TYPE) {
+	public static void normalizePrecomputedMSTFeatures(CATEGORY_TYPE category_TYPE) {
 		try (ImageIterator iterator = new ImageIterator(category_TYPE);) {
 
 			for (String key : ImageIterator.mstFeatures.keySet()) {
@@ -182,16 +179,13 @@ public class DataTrainer {
 			}
 
 			File outFile = new File(
-					"C:\\Users\\GEORGE MUGALE\\Desktop\\CS3 Mini Project\\Project\\Main src\\data\\reference-data\\"
-							+ category_TYPE.toString() + "\\precomputed-mst-features.dat");
+					"data\\reference-data\\" + category_TYPE.toString() + "\\precomputed-mst-features.dat");
 
 			try (FileOutputStream fos = new FileOutputStream(outFile);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);
 					ObjectOutputStream oos = new ObjectOutputStream(bos);) {
 
 				oos.writeObject(ImageIterator.mstFeatures);
-
-				System.out.println(ImageIterator.mstFeatures.size());
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -204,6 +198,31 @@ public class DataTrainer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static void main(String[] args) {
+
+		// precompute msts
+//		preComputeMSTs(CATEGORY_TYPE.ONLY_WATER_SIDE_VIEW);
+//		System.gc();
+//		preComputeMSTs(CATEGORY_TYPE.ONLY_WATER_TOP_VIEW);
+//		System.gc();
+//		preComputeMSTs(CATEGORY_TYPE.WATER_IN_OPAQUE);
+//		System.gc();
+//		preComputeMSTs(CATEGORY_TYPE.WATER_IN_TRANSPARENT);
+//		System.gc();
+
+		// calculate means and standard deviations, then manually add to static class
+		// fields
+//		calcMeansAndStdDevs();
+
+		// normalize precomputed msts features for entire data set, only after manually
+		// changing means and std devs
+		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.ONLY_WATER_SIDE_VIEW);
+		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.ONLY_WATER_TOP_VIEW);
+		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_OPAQUE);
+		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_TRANSPARENT);
+
 	}
 
 }

@@ -2,6 +2,7 @@ package acsse.csc3a.graph.algorithms;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import acsse.csc3a.graph.Vertex;
 import acsse.csc3a.lists.ArrayList;
@@ -10,22 +11,27 @@ import acsse.csc3a.map.Map;
 public class MSTFeatures implements Serializable {
 
 	/*
-	 * Training/ know dataset results
-	 * 
-	 * meanTotal: 5816869.5 stdTotal: 6845017.5 meanAvg: 132.75655 stdAvg: 26.181938
-	 * meanVar: 6436.2017 stdVar: 3788.474 meanEdge: 44666.05 stdEdge: 52473.773
+	 * Training/ know dataset results 
+	 * meanTotal: 4516127.5 
+	 * stdTotal: 5961088.5
+	 * meanAvg: 133.4319 
+	 * stdAvg: 26.10389 
+	 * meanVar: 6503.956 
+	 * stdVar: 3798.0818
+	 * meanEdge: 34397.035 
+	 * stdEdge: 45944.926
 	 */
-	public static float meanTotal = 5816869.5f;
-	public static float stdTotal = 6845017.5f;
+	public static float meanTotal = 4516127.5f;
+	public static float stdTotal = 5961088.5f;
 
-	public static float meanAvg = 132.75655f;
-	public static float stdAvg = 26.181938f;
+	public static float meanAvg = 133.4319f;
+	public static float stdAvg = 26.10389f;
 
-	public static float meanVar = 6436.2017f;
-	public static float stdVar = 3788.474f;
+	public static float meanVar = 6503.956f;
+	public static float stdVar = 3798.0818f;
 
-	public static float meanEdge = 44666.05f;
-	public static float stdEdge = 52473.773f;
+	public static float meanEdge = 34397.035f;
+	public static float stdEdge = 45944.926f;
 
 	public float totalWeight;
 	public float averageWeight;
@@ -135,10 +141,12 @@ public class MSTFeatures implements Serializable {
 
 			for (int i = 0; i < n; i++) {
 				MSTFeatures f = featuresList.get(i);
-				totalWeights[i] = f.totalWeight;
-				averageWeights[i] = f.averageWeight;
-				variances[i] = f.variance;
-				edgeCounts[i] = f.edgeCount;
+				if (f != null) {
+					totalWeights[i] = f.totalWeight;
+					averageWeights[i] = f.averageWeight;
+					variances[i] = f.variance;
+					edgeCounts[i] = f.edgeCount;
+				} 
 			}
 
 			float meanTotal = calcMean(totalWeights);
@@ -177,10 +185,12 @@ public class MSTFeatures implements Serializable {
 
 			for (int i = 0; i < n; i++) {
 				MSTFeatures f = featuresList.get(i);
-				totalWeights[i] = f.totalWeight;
-				averageWeights[i] = f.averageWeight;
-				variances[i] = f.variance;
-				edgeCounts[i] = f.edgeCount;
+				if (f != null) {
+					totalWeights[i] = f.totalWeight;
+					averageWeights[i] = f.averageWeight;
+					variances[i] = f.variance;
+					edgeCounts[i] = f.edgeCount;
+				}
 			}
 
 			// Step 2: Compute means and std deviation
@@ -246,7 +256,9 @@ public class MSTFeatures implements Serializable {
 
 			double tot = 0.0;
 			for (T num : values) {
-				tot += num.doubleValue(); // Convert any Number to double
+				if (num != null) {
+					tot += num.doubleValue(); // Convert any Number to double
+				}
 			}
 
 			return (float) (tot / values.length);
