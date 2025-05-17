@@ -1,9 +1,11 @@
-package acsse.csc3a.observer;
+package acsse.csc3a.analyser;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import acsse.csc3a.graph.algorithms.kNearestNeighbor;
 import acsse.csc3a.imagegraph.ImageGraph;
-import acsse.csc3a.imagegraph.WaterQualityDetectorVisitor;
+import acsse.csc3a.io.ImageIterator;
 
 public class ImageAnalyser implements AbstractSubject {
 
@@ -23,7 +25,13 @@ public class ImageAnalyser implements AbstractSubject {
 	}
 
 	@Override
-	public void notifyObservers(Result result) {
+	public void notifyObserversMatch(Result result) {
+		// TODO Auto-generated method stub
+		if (observer != null) observer.update(result);
+	}
+	
+	@Override
+	public void notifyObserversCat(Result result) {
 		// TODO Auto-generated method stub
 		if (observer != null) observer.update(result);
 	}
@@ -32,10 +40,19 @@ public class ImageAnalyser implements AbstractSubject {
 		// TODO Auto-generated method stub
 		
 		imageGraph = new ImageGraph(image);
+
+		Result result = new Result();
 		
-		Result result = imageGraph.accept(new WaterQualityDetectorVisitor());
+		try {
+			result.category_TYPE = kNearestNeighbor.classify(imageGraph, new ImageIterator(), 5);
+			this.notifyObserversCat(result);
+			result.match_TYPE = kNearestNeighbor.match(imageGraph, new ImageIterator(result.category_TYPE), 3);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		this.notifyObservers(result);
+		this.notifyObserversMatch(result);
 	}
 
 }

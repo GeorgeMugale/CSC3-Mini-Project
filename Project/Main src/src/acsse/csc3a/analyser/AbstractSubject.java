@@ -1,7 +1,8 @@
-package acsse.csc3a.observer;
+package acsse.csc3a.analyser;
 
 public interface AbstractSubject {
 	void attach(AbstractObserver o);
 	void detach();
-	void notifyObservers(Result result);
+	void notifyObserversCat(Result result);
+	void notifyObserversMatch(Result result);
 }

@@ -1,0 +1,119 @@
+
+## 🔶 1. Feature Vectors
+
+Let’s define:
+
+* **f_new**: MST feature vector for the *new* graph (the one you're comparing)
+* **f_ref**: MST feature vector for a *reference* graph
+
+Assume each MST feature vector is:
+
+```plaintext
+f = [TotalWeight, AvgWeight, Variance, EdgeCount]
+```
+
+You can split this vector into two parts:
+
+* **Appearance Features**: `f_appear = [TotalWeight, AvgWeight]`
+* **Structural Features**: `f_struct = [Variance, EdgeCount]`
+
+---
+
+## 🔶 2. Distance Metric Options
+
+To compute `d_struct(f_new, f_ref)` and `d_appear(f_new, f_ref)`, you apply a distance metric to the corresponding feature sub-vectors:
+
+### ✅ Option A: **Euclidean Distance**
+
+This is the most straightforward:
+
+```plaintext
+d_appear(f_new, f_ref) = √[(T_new - T_ref)² + (A_new - A_ref)²]
+d_struct(f_new, f_ref) = √[(V_new - V_ref)² + (E_new - E_ref)²]
+```
+
+Where:
+
+* T = Total MST Weight
+* A = Average MST Weight
+* V = MST Edge Weight Variance
+* E = Edge Count
+
+### ✅ Option B: **Mahalanobis Distance** (better if your features have different scales or are correlated)
+
+You compute:
+
+```plaintext
+d_appear = √[(f_appear_new - f_appear_ref)^T * S⁻¹ * (f_appear_new - f_appear_ref)]
+```
+
+Where:
+
+* `S` = Covariance matrix of the appearance features across your training/reference set
+
+Similarly for `d_struct`.
+
+> ❗**Note**: If you use Mahalanobis, you'll need to compute the **covariance matrix** `S` of your feature vectors from your dataset of known graphs. This is more accurate but requires more setup.
+
+---
+
+## 🔶 3. Normalize Features (Recommended for Euclidean)
+
+If your features have **very different ranges** (e.g., TotalWeight might be in hundreds while Variance is <10), then normalize first:
+
+* **Z-score normalization**:
+
+  ```plaintext
+  1
+  ```
+
+  Where:
+
+  * `μ` is the mean of that feature across training/reference data
+  * `σ` is the standard deviation
+
+Then compute Euclidean or Mahalanobis distance on these **normalized vectors**.
+
+---
+
+## 🔶 Example: Computing `d_appear` and `d_struct`
+
+Let’s say:
+
+```
+f_new        = [280, 9.2, 3.9, 50]
+f_ref_clean  = [120, 3.5, 1.1, 50]
+f_ref_dirty  = [300, 10.0, 3.7, 50]
+```
+
+Compute distances (Euclidean, unnormalized):
+
+```plaintext
+d_appear_clean = sqrt((280 - 120)^2 + (9.2 - 3.5)^2)
+               = sqrt(160^2 + 5.7^2)
+               ≈ sqrt(25600 + 32.49)
+               ≈ sqrt(25632.49) ≈ 160.09
+
+d_appear_dirty = sqrt((280 - 300)^2 + (9.2 - 10.0)^2)
+               = sqrt(20^2 + 0.8^2)
+               = sqrt(400 + 0.64) = sqrt(400.64) ≈ 20.01
+```
+
+So here, the new graph is much closer in appearance to the "dirty" water.
+
+---
+
+## ✅ Summary
+
+| Distance   | Features Used             | Formula                             |
+| ---------- | ------------------------- | ----------------------------------- |
+| `d_appear` | \[TotalWeight, AvgWeight] | Euclidean or Mahalanobis on those 2 |
+| `d_struct` | \[Variance, EdgeCount]    | Euclidean or Mahalanobis on those 2 |
+
+* Normalize your features if using Euclidean.
+* Use thresholds like `τ_appear` and `τ_struct` to decide whether a reference graph is similar enough.
+* You can implement this easily in Python using NumPy or SciPy.
+
+---
+
+Would you like a code snippet that computes both distances using NumPy?

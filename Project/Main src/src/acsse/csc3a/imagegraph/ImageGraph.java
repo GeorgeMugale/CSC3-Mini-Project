@@ -16,7 +16,7 @@ import acsse.csc3a.graph.algorithms.MSTFeatures;
 import acsse.csc3a.map.AbstractMap;
 import acsse.csc3a.map.AdjacencyMap;
 
-public class ImageGraph implements AbstractVisitable, Serializable {
+public class ImageGraph implements Serializable {
 
 	transient private BufferedImage image;
 	transient private Graph<Point, Float> graph;
@@ -215,12 +215,6 @@ public class ImageGraph implements AbstractVisitable, Serializable {
 
 			System.out.println();
 		}
-	}
-
-	@Override
-	public Result accept(AbstractVisitor visitor) {
-		// TODO Auto-generated method stub
-		return visitor.visit(this);
 	}
 
 	// Custom serialization logic

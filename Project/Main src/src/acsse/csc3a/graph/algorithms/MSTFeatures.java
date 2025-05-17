@@ -15,14 +15,6 @@ public class MSTFeatures implements Serializable {
 	 * meanTotal: 5816869.5 stdTotal: 6845017.5 meanAvg: 132.75655 stdAvg: 26.181938
 	 * meanVar: 6436.2017 stdVar: 3788.474 meanEdge: 44666.05 stdEdge: 52473.773
 	 */
-
-	public float totalWeight;
-	public float averageWeight;
-	public float variance;
-	public int edgeCount;
-	transient public Map<Vertex<?>, Integer> degreeMap;
-	public MATCH_TYPE match_TYPE;
-	public CATEGORY_TYPE category_TYPE;
 	public static float meanTotal = 5816869.5f;
 	public static float stdTotal = 6845017.5f;
 
@@ -34,6 +26,14 @@ public class MSTFeatures implements Serializable {
 
 	public static float meanEdge = 44666.05f;
 	public static float stdEdge = 52473.773f;
+
+	public float totalWeight;
+	public float averageWeight;
+	public float variance;
+	public int edgeCount;
+	transient public Map<Vertex<?>, Integer> degreeMap;
+	public MATCH_TYPE match_TYPE;
+	public CATEGORY_TYPE category_TYPE;
 
 	@Override
 	public String toString() {
@@ -118,20 +118,62 @@ public class MSTFeatures implements Serializable {
 			float thisWeighted = 0.7f * this.d_struct + 0.3f * this.d_appear;
 			float otherWeighted = 0.7f * o.d_struct + 0.3f * o.d_appear;
 			return Float.compare(thisWeighted, otherWeighted);
-			
+
 		}
 	}
 
 	public static class MSTNormalizer {
 
+		public static String getStardDeveations(List<MSTFeatures> featuresList) {
+			int n = featuresList.size();
+
+			// Step 1: Collect feature arrays
+			Float[] totalWeights = new Float[n];
+			Float[] averageWeights = new Float[n];
+			Float[] variances = new Float[n];
+			Integer[] edgeCounts = new Integer[n];
+
+			for (int i = 0; i < n; i++) {
+				MSTFeatures f = featuresList.get(i);
+				totalWeights[i] = f.totalWeight;
+				averageWeights[i] = f.averageWeight;
+				variances[i] = f.variance;
+				edgeCounts[i] = f.edgeCount;
+			}
+
+			float meanTotal = calcMean(totalWeights);
+			float stdTotal = calcStandardDeviation(totalWeights, meanTotal);
+
+			float meanAvg = calcMean(averageWeights);
+			float stdAvg = calcStandardDeviation(averageWeights, meanAvg);
+
+			float meanVar = calcMean(variances);
+			float stdVar = calcStandardDeviation(variances, meanVar);
+
+			float meanEdge = calcMean(edgeCounts);
+			float stdEdge = calcStandardDeviation(edgeCounts, meanEdge);
+
+			return String.format(
+					"\nmeanTotal: %s \nstdTotal: %s \nmeanAvg: %s \nstdAvg: %s \nmeanVar: %s \nstdVar: %s \nmeanEdge: %s \nstdEdge: %s",
+					meanTotal, stdTotal, meanAvg, stdAvg, meanVar, stdVar, meanEdge, stdEdge);
+
+		}
+
+		/**
+		 * This method calculates the means and standard deveations normalizes a list of
+		 * MSTFeatures and normalizes them
+		 * 
+		 * @param featuresList
+		 * @return
+		 */
 		public static List<MSTFeatures> normalizeAll(List<MSTFeatures> featuresList) {
 			int n = featuresList.size();
 
 			// Step 1: Collect feature arrays
-			float[] totalWeights = new float[n];
-			float[] averageWeights = new float[n];
-			float[] variances = new float[n];
-			int[] edgeCounts = new int[n];
+			Float[] totalWeights = new Float[n];
+			Float[] averageWeights = new Float[n];
+			Float[] variances = new Float[n];
+			Integer[] edgeCounts = new Integer[n];
 
 			for (int i = 0; i < n; i++) {
 				MSTFeatures f = featuresList.get(i);
@@ -142,26 +184,27 @@ public class MSTFeatures implements Serializable {
 			}
 
 			// Step 2: Compute means and std deviation
-			float meanTotal = mean(totalWeights);
-			float stdTotal = stdDev(totalWeights, meanTotal);
+			float meanTotal = calcMean(totalWeights);
+			float stdTotal = calcStandardDeviation(totalWeights, meanTotal);
 
-			float meanAvg = mean(averageWeights);
-			float stdAvg = stdDev(averageWeights, meanAvg);
+			float meanAvg = calcMean(averageWeights);
+			float stdAvg = calcStandardDeviation(averageWeights, meanAvg);
 
-			float meanVar = mean(variances);
-			float stdVar = stdDev(variances, meanVar);
+			float meanVar = calcMean(variances);
+			float stdVar = calcStandardDeviation(variances, meanVar);
 
-			float meanEdge = mean(edgeCounts);
-			float stdEdge = stdDev(edgeCounts, meanEdge);
+			float meanEdge = calcMean(edgeCounts);
+			float stdEdge = calcStandardDeviation(edgeCounts, meanEdge);
 
-			// Step 3: Normalize each vector
+			// Step 3: Normalize each feature
 			List<MSTFeatures> normalized = new ArrayList<>();
 			for (MSTFeatures f : featuresList) {
 				MSTFeatures norm = new MSTFeatures();
 				norm.totalWeight = (f.totalWeight - meanTotal) / stdTotal;
 				norm.averageWeight = (f.averageWeight - meanAvg) / stdAvg;
 				norm.variance = (f.variance - meanVar) / stdVar;
-				norm.edgeCount = Math.round((f.edgeCount - meanEdge) / stdEdge); // You can keep as float if needed
+				norm.edgeCount = Math.round((f.edgeCount - meanEdge) / stdEdge);
+
 				normalized.add(norm);
 			}
 
@@ -172,8 +215,14 @@ public class MSTFeatures implements Serializable {
 			return normalized;
 		}
 
-		public static MSTFeatures normalizeNew(MSTFeatures newMST, float meanTotal, float stdTotal, float meanAvg,
-				float stdAvg, float meanVar, float stdVar, float meanEdge, float stdEdge) {
+		/**
+		 * This method takes a new MSTFeature an normalizes its values so it can be used
+		 * for subsequent calculations with the trained data (whihc is also normalized)
+		 * 
+		 * @param newMST new mts feature being normalized
+		 * @return a normalized mstFeature
+		 */
+		public static MSTFeatures normalizeNew(MSTFeatures newMST) {
 			MSTFeatures norm = new MSTFeatures();
 			norm.totalWeight = (newMST.totalWeight - meanTotal) / stdTotal;
 			norm.averageWeight = (newMST.averageWeight - meanAvg) / stdAvg;
@@ -183,32 +232,42 @@ public class MSTFeatures implements Serializable {
 			return norm;
 		}
 
-		// Utility methods
-		public static float mean(float[] values) {
-			double sum = 0;
-			for (double v : values)
-				sum += v;
-			return (float) (sum / values.length);
+		/**
+		 * This method calculates the mean of an array of values
+		 * 
+		 * @param <T>    any number
+		 * @param values an array of values
+		 * @return the mean
+		 */
+		public static <T extends Number> float calcMean(T[] values) {
+			if (values == null || values.length == 0) {
+				throw new IllegalArgumentException("Input array must not be null or empty");
+			}
+
+			double tot = 0.0;
+			for (T num : values) {
+				tot += num.doubleValue(); // Convert any Number to double
+			}
+
+			return (float) (tot / values.length);
 		}
 
-		public static float mean(int[] values) {
-			double sum = 0;
-			for (int v : values)
-				sum += v;
-			return (float) (sum / values.length);
-		}
+		/**
+		 * This method calculates the standard deviation of an array of values
+		 * 
+		 * @param <T>    any number
+		 * @param values an array of values
+		 * @return the mean
+		 */
+		public static <T extends Number> float calcStandardDeviation(T[] values, float mean) {
+			if (values == null || values.length == 0) {
+				throw new IllegalArgumentException("Input array must not be null or empty");
+			}
 
-		public static float stdDev(float[] values, float mean) {
-			double sum = 0;
-			for (double v : values)
-				sum += Math.pow(v - mean, 2);
-			return (float) Math.sqrt(sum / values.length);
-		}
-
-		public static float stdDev(int[] values, float mean) {
-			double sum = 0;
-			for (int v : values)
-				sum += Math.pow(v - mean, 2);
+			double sum = 0.0;
+			for (T num : values) {
+				sum += Math.pow(num.doubleValue() - mean, 2);
+			}
 			return (float) Math.sqrt(sum / values.length);
 		}
 	}

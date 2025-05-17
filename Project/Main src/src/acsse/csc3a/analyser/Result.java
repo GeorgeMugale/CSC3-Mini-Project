@@ -1,4 +1,4 @@
-package acsse.csc3a.observer;
+package acsse.csc3a.analyser;
 
 import acsse.csc3a.graph.algorithms.CATEGORY_TYPE;
 import acsse.csc3a.graph.algorithms.MATCH_TYPE;

@@ -1,0 +1,45 @@
+You invoke the full GED **only after** your MST‑based pre‑filter lets a reference graph through. In practice your pipeline looks like this:
+
+1. **Precompute** and store each reference’s MST fingerprint
+   *(totalWeight, avgWeight, variance, degreeHistogram)*
+
+2. **At classification time**, for a new graph G:
+   a. Compute `MSTFeatures fG = calcMSTWithFeatures(G)`
+   b. For each reference graph R with features fR:
+
+     • Optionally include a histogram‐distance term for the degree distributions.
+   c. **Shortlist** only those R for which $d_{\text{MST}}(G,R)$ is below some threshold τ.
+
+3. **Only for that shortlist**, now run your expensive
+
+   ```java
+   double ged = calculateGraphEditDistance(G, R);
+   ```
+
+   to get the precise graph‐edit distance.
+
+4. Finally, if you’re doing k‑NN, you’ll sort your shortlist by GED and pick the top‑k; or if you’re simply classifying container type vs. dirty/clean, you pick whichever GED is lowest.
+
+— 
+**Why this order?**
+
+* **MST fingerprinting** is $O(E\log V)$ once and compares in microseconds.
+* **Full GED** can be $O(V³)$ or worse if you do matching algorithms; doing it only on a small shortlist (say 5–10 candidates) saves you 90–99% of wasted work.
+
+So in code, it’s as simple as:
+
+```text
+featuresG = calcMSTWithFeatures(G)
+shortlist = []
+for each reference R:
+  if MSTdistance(featuresG, featuresR) < τ:
+    shortlist.add(R)
+
+for each R in shortlist:
+  ged = calculateGraphEditDistance(G, R)
+  record (R.label, ged)
+
+finalDecision = chooseBasedOnGEDs()
+```
+
+That “for each R in shortlist” block is exactly where you invoke your full GED.
