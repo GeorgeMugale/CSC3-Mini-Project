@@ -16,7 +16,7 @@ import acsse.csc3a.map.AbstractMap;
 import acsse.csc3a.map.AdjacencyMap;
 
 
-public class ImageGraph implements Serializable {
+public class ImageGraph implements Serializable, GraphFeatureSource {
 
 	transient private BufferedImage image;
 	transient private Graph<Point, Float> graph;
@@ -48,7 +48,7 @@ public class ImageGraph implements Serializable {
 	public void setLabel(MATCH_TYPE label) {
 		this.label = label;
 	}
-
+	
 	public ImageGraph(BufferedImage image) {
 
 		this.image = image;

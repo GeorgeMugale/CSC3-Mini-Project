@@ -13,12 +13,14 @@ import javax.imageio.ImageIO;
 import acsse.csc3a.graph.algorithms.CATEGORY_TYPE;
 import acsse.csc3a.graph.algorithms.MATCH_TYPE;
 import acsse.csc3a.graph.algorithms.MSTFeatures;
+import acsse.csc3a.imagegraph.AbstractImageGraphProxy;
 import acsse.csc3a.imagegraph.ImageGraph;
+import acsse.csc3a.imagegraph.ImageGraphProxy;
 import acsse.csc3a.lists.ArrayList;
 import acsse.csc3a.map.AbstractMap;
 import acsse.csc3a.map.AdjacencyMap;
 
-public class ImageIterator implements Iterator<ImageGraph>, Closeable {
+public class ImageIterator implements Iterator<AbstractImageGraphProxy>, Closeable {
 	private final File[] files;
 	public static AbstractMap<String, MSTFeatures> mstFeatures = new AdjacencyMap<>();
 	private int currentIndex = 0;
@@ -156,7 +158,7 @@ public class ImageIterator implements Iterator<ImageGraph>, Closeable {
 	}
 
 	@Override
-	public ImageGraph next() {
+	public AbstractImageGraphProxy next() {
 		if (!hasNext()) {
 			throw new NoSuchElementException("No more images to process");
 		}
@@ -181,17 +183,17 @@ public class ImageIterator implements Iterator<ImageGraph>, Closeable {
 
 				return next(); // Skip to next file
 			}
+			
+			// create the key which maps to an image graph's mst features
+			String featureKeyString = new File(currentFile.getParent()).getName() + currentFile.getName();
 
-			ImageGraph graph = new ImageGraph(image);
-			configureGraphLabels(graph, currentFile);
-			determineWaterImageType(graph, currentFile);
-			graph.setFeatures(mstFeatures.get(new File(currentFile.getParent()).getName() + currentFile.getName()));
+			// create a prooxy
+			ImageGraphProxy proxy = new ImageGraphProxy(image, currentFile, mstFeatures.get(featureKeyString));
 
-			// Prepare for next call
+			// Prepare for the next call
 			advanceToNextValid();
-			image.flush();
 
-			return graph;
+			return proxy;
 		} catch (IOException e) {
 			close();
 			throw new RuntimeException("Error processing image file", e);
@@ -220,32 +222,6 @@ public class ImageIterator implements Iterator<ImageGraph>, Closeable {
 		}
 		hasNext = false;
 		close();
-	}
-
-	private void configureGraphLabels(ImageGraph graph, File file) {
-		String name = file.getName().toLowerCase();
-		MATCH_TYPE label = MATCH_TYPE.GREEN; // Default
-
-		if (name.contains("undrink")) {
-			label = MATCH_TYPE.RED;
-		} else if (name.contains("dirty") && !name.contains("undrink")) {
-			label = MATCH_TYPE.ORANGE;
-		} else if (name.contains("moderate")) {
-			label = MATCH_TYPE.YELLOW;
-		}
-
-		graph.setLabel(label);
-	}
-
-	private void determineWaterImageType(ImageGraph graph, File file) {
-		String path = file.getAbsolutePath();
-		for (CATEGORY_TYPE type : CATEGORY_TYPE.values()) {
-			if (path.contains(type.toString())) {
-				graph.setWaterImageType(type);
-				return;
-			}
-		}
-		throw new IllegalStateException("Invalid directory structure for file: " + path);
 	}
 
 	@Override

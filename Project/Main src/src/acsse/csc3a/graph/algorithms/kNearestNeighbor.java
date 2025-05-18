@@ -1,14 +1,12 @@
 package acsse.csc3a.graph.algorithms;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 import acsse.csc3a.graph.algorithms.MSTFeatures.Distance;
+import acsse.csc3a.imagegraph.AbstractImageGraphProxy;
 import acsse.csc3a.imagegraph.ImageGraph;
 import acsse.csc3a.imagegraph.Point;
 import acsse.csc3a.io.ImageIterator;
@@ -107,8 +105,10 @@ public class kNearestNeighbor {
 			}
 		}
 
-		// initialize the best match, if no likely match it will by default be water
-		// from top view
+		/*
+		 * initialize the best match, if no likely match it will by default be water
+		 * from top view
+		 */
 		CATEGORY_TYPE bestMatch = CATEGORY_TYPE.ONLY_WATER_TOP_VIEW;
 		int highestFrequency = Integer.MIN_VALUE;
 
@@ -166,23 +166,27 @@ public class kNearestNeighbor {
 				avgFeatures.getAppearanceFeatures());
 		float average_d_struct = MSTFeatures.d_struct(inputGraph.getFeatures().getStrcuturalFeatures(),
 				avgFeatures.getStrcuturalFeatures());
+		
+		
 		/*
 		 * get GED of all graphs in loop and add them to a list of pairs that represent
 		 * the label and the GED
 		 */
 		while (referenceGraphs.hasNext()) {
-			// get the current image graph from the reference data set
-			ImageGraph imageGraph = referenceGraphs.next();
+			// get the current image graph proxy from the reference data set
+			AbstractImageGraphProxy proxy = referenceGraphs.next();
 
 			// calculate the distance
 			float current_d_appear = MSTFeatures.d_appear(inputGraph.getFeatures().getAppearanceFeatures(),
-					imageGraph.getFeatures().getAppearanceFeatures());
+					proxy.getFeatures().getAppearanceFeatures());
 			float current_d_strcut = MSTFeatures.d_struct(inputGraph.getFeatures().getStrcuturalFeatures(),
-					imageGraph.getFeatures().getStrcuturalFeatures());
+					proxy.getFeatures().getStrcuturalFeatures());
 
-			
-			// quick reject, GED calculation only performed on relevant graphs
+			// quick reject, Graph construction and GED calculation only performed on relevant graphs
 			if (current_d_appear < average_d_appear || current_d_strcut < average_d_struct) {
+				// do resource heavy task of constructing ImageGraph
+				ImageGraph imageGraph = proxy.getGraph();
+				
 				// calculate how different it is from the new image
 				double distance = GED.calculateGraphEditDistance(inputGraph, imageGraph);
 				// store the type of image and the difference
@@ -193,7 +197,6 @@ public class kNearestNeighbor {
 			}
 
 		}
-
 
 		// close all references in the stream and for call garbage collector
 		referenceGraphs.close();
@@ -299,24 +302,6 @@ public class kNearestNeighbor {
 		averageFeatures.normalize();
 
 		return averageFeatures;
-	}
-
-	public static void main(String[] args) {
-
-		try (ImageIterator iterator = new ImageIterator(CATEGORY_TYPE.ONLY_WATER_SIDE_VIEW);) {
-
-			File file = new File(
-					"C:\\Users\\GEORGE MUGALE\\Desktop\\CS3 Mini Project\\CS3 Mini Project\\Project\\Main src\\data\\images\\clean water 2.jpg");
-
-			ImageGraph graph = new ImageGraph(ImageIO.read(file));
-
-			System.out.println(match(graph, iterator, 5));
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 }

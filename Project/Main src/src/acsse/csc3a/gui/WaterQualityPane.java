@@ -45,7 +45,8 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 	private HBox topMenu;
 	private Stage primaryStage;
 	private ImageView fullImageView;
-	private Label labelResults;
+	private Label labelCatResults;
+	private Label labelMatchResults;
 	private VBox thumbnailGallery;
 	public Button analyzeButton;
 	public static final String IMAGES_DIR = "data/images/";
@@ -79,6 +80,12 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 		setCenter();
 
 		loadThumbnails(new File(IMAGES_DIR));
+	}
+	
+	public void initLabelText() {
+		labelCatResults.setText("Analyzing image (this mat take a while)...");
+		labelMatchResults.setText("");
+		labelMatchResults.setTextFill(Color.BLACK);
 	}
 
 	private void setTopMenu() {
@@ -145,43 +152,28 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 		setHover(analyzeButton);
 
-		labelResults = new Label("Select an image to analyze.");
-		labelResults.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+		labelCatResults = new Label("Select an image to analyze.");
+		labelCatResults.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+		
+		labelMatchResults = new Label("");
+		labelMatchResults.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
 		// You can make it indeterminate (spinning) or determinate (showing progress)
 		
-		VBox rightPane = new VBox(20, imagePane, analyzeButton, labelResults);
+		VBox rightPane = new VBox(20, imagePane, analyzeButton, labelCatResults, labelMatchResults);
 		rightPane.setAlignment(Pos.BOTTOM_CENTER);
 		rightPane.setPadding(new Insets(20, 40, 20, 40));
 		this.setCenter(rightPane);
 
-		analyzeButton.setOnAction(e -> {
-			labelResults.setText("Analyzing image (this mat take a while)...");
-			this.labelResults.setTextFill(Color.BLACK);
-		});
 	}
 
-	// Load fixed-size thumbnails into the gallery without white space
-	/*
-	 * public void loadThumbnails() { thumbnailGallery.getChildren().clear(); for
-	 * (String imagePath : imagePaths) { Image image = new Image(imagePath);
-	 * ImageView thumbView = new ImageView(image); thumbView.setFitWidth(140);
-	 * thumbView.setFitHeight(100); thumbView.setPreserveRatio(false);
-	 * thumbView.setSmooth(true); thumbView.setCache(true); thumbView.
-	 * setStyle("-fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 5, 0, 0, 1);"
-	 * );
-	 * 
-	 * setHover(thumbView); thumbView.setOnMouseClicked(event ->
-	 * showFullImage(imagePath, event));
-	 * thumbnailGallery.getChildren().add(thumbView); } }
-	 */
 
 	// Show full image on the right when thumbnail is clicked
 	private void showFullImage(String imagePath, MouseEvent event) {
 		if (event.getClickCount() == 1) {
 			Image image = new Image(imagePath);
 			fullImageView.setImage(image);
-			labelResults.setText("Ready to analyze selected image.");
+			labelCatResults.setText("Ready to analyze selected image.");
 		}
 	}
 
@@ -268,15 +260,31 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 		return bufferedImage;
 	}
+	
+	@Override
+	public void updateMatch(Result result) {
+		// TODO Auto-generated method stub
+		labelMatchResults.setText("Similarity detection complete: " + result.getQuality());
+		labelMatchResults.setTextFill(result.textColour());
+	}
 
 	@Override
-	public void update(Result result) {
+	public void updateCat(Result result) {
 		// TODO Auto-generated method stub
-
-		this.labelResults.setText(
-				"analyzation complete: category: " + result.getCategory() + " quality: " + result.getQuality());
-
-		this.labelResults.setTextFill(result.textColour());
+		labelCatResults.setText("Classification Complete: " + result.getCategory());
 	}
-	
+
+	@Override
+	public void update(String result) {
+		// TODO Auto-generated method stub
+		
+		String[] tokens = result.split("---");
+		
+		AlertType updateType = tokens[0] == "ERR"? AlertType.ERROR : AlertType.INFORMATION;
+		
+		showMessage(tokens[1], tokens[2], updateType);
+		
+	}
+
+
 }
