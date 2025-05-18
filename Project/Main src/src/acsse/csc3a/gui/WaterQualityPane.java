@@ -55,8 +55,6 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 		this.primaryStage = primaryStage;
 
 		this.setPadding(new Insets(10));
-//		this.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f5f7fa, #c3cfe2);");
-
 		Timeline timeline = new Timeline();
 		timeline.setCycleCount(Animation.INDEFINITE);
 

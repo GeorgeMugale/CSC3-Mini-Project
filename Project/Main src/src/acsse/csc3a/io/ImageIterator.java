@@ -53,6 +53,11 @@ public class ImageIterator implements Iterator<ImageGraph>, Closeable {
 		}
 		this.skipChance = skipChance;
 	}
+	
+	
+	public CATEGORY_TYPE getCategory() {
+		return categoryType;
+	}
 
 	private File determineImageDirectory() {
 		return categoryType == null ? new File("data/reference-data")
@@ -95,7 +100,7 @@ public class ImageIterator implements Iterator<ImageGraph>, Closeable {
 
 				if (obj instanceof AbstractMap) {
 					AbstractMap<String, MSTFeatures> map = (AbstractMap<String, MSTFeatures>) obj;
-					this.mstFeatures.putAll(map);
+					mstFeatures.putAll(map);
 				}
 
 			} catch (IOException e) {
@@ -248,6 +253,7 @@ public class ImageIterator implements Iterator<ImageGraph>, Closeable {
 		if (!closed) {
 			closed = true;
 			hasNext = false;
+			System.gc();
 		}
 	}
 }
