@@ -151,6 +151,10 @@ public class ImageIterator implements Iterator<AbstractImageGraphProxy>, Closeab
 
 		return imageFiles.toArray(new File[0]);
 	}
+	
+	public int count() {
+		return files.length;
+	}
 
 	@Override
 	public boolean hasNext() {
@@ -166,7 +170,7 @@ public class ImageIterator implements Iterator<AbstractImageGraphProxy>, Closeab
 		try {
 			File currentFile = files[currentIndex++];
 
-			System.out.println(currentFile.getName());
+//			System.out.println(currentFile.getName());
 
 			BufferedImage image = ImageIO.read(currentFile);
 

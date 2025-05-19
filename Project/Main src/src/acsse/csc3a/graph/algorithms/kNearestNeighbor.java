@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiConsumer;
 
+import acsse.csc3a.analyser.ImageAnalyser;
 import acsse.csc3a.graph.algorithms.MSTFeatures.Distance;
 import acsse.csc3a.imagegraph.AbstractImageGraphProxy;
 import acsse.csc3a.imagegraph.ImageGraph;
@@ -15,6 +17,12 @@ import acsse.csc3a.map.AdjacencyMap;
 import acsse.csc3a.map.Map;
 
 public class kNearestNeighbor {
+
+	private BiConsumer<Double, Double> updateProgress;
+
+	public kNearestNeighbor(BiConsumer<Double, Double> updateProgress) {
+		this.updateProgress = updateProgress;
+	}
 
 	/**
 	 * This inner class realizes the composite design pattern, which in a nutshell
@@ -56,7 +64,7 @@ public class kNearestNeighbor {
 	 *                        initial match list is pruned
 	 * @return the most likely category which the image falls under
 	 */
-	public static CATEGORY_TYPE classify(ImageGraph inputGraph, ImageIterator referenceGraphs, int K) {
+	public CATEGORY_TYPE classify(ImageGraph inputGraph, ImageIterator referenceGraphs, int K) {
 
 		// first check if arguments are correct
 		if (referenceGraphs == null || !referenceGraphs.hasNext() || K <= 0) {
@@ -69,6 +77,7 @@ public class kNearestNeighbor {
 		// use Prim's MST to calculate the MST for the new graph image
 		Prims_MST<Point> MST = new Prims_MST<>();
 		inputGraph.setFeatures(MST.CalcMST(inputGraph.getGraph()));
+		inputGraph.getFeatures().normalize();
 
 		/*
 		 * calculate the distance between the mst features of the reference graphs and
@@ -138,9 +147,11 @@ public class kNearestNeighbor {
 	 * @param referenceGraphs the reference graphs used to classify
 	 * @param K               the number of elements that will be left after this
 	 *                        initial match list is pruned
+	 * @param updateProgress  Represents a generic progress updater (which is a
+	 *                        function that takes two doubles and returns nothing)
 	 * @return the most likely similarity match which the image falls under
 	 */
-	public static MATCH_TYPE match(ImageGraph inputGraph, ImageIterator referenceGraphs, int K) {
+	public MATCH_TYPE match(ImageGraph inputGraph, ImageIterator referenceGraphs, int K) {
 		// first check if arguments are correct
 		if (referenceGraphs == null || !referenceGraphs.hasNext() || K <= 0) {
 			throw new IllegalArgumentException("Invalid input parameters");
@@ -166,8 +177,10 @@ public class kNearestNeighbor {
 				avgFeatures.getAppearanceFeatures());
 		float average_d_struct = MSTFeatures.d_struct(inputGraph.getFeatures().getStrcuturalFeatures(),
 				avgFeatures.getStrcuturalFeatures());
-		
-		
+
+		double count = 0.00;
+		double numGraphs = (double) referenceGraphs.count();
+
 		/*
 		 * get GED of all graphs in loop and add them to a list of pairs that represent
 		 * the label and the GED
@@ -175,6 +188,8 @@ public class kNearestNeighbor {
 		while (referenceGraphs.hasNext()) {
 			// get the current image graph proxy from the reference data set
 			AbstractImageGraphProxy proxy = referenceGraphs.next();
+			
+			progress(++count, numGraphs);
 
 			// calculate the distance
 			float current_d_appear = MSTFeatures.d_appear(inputGraph.getFeatures().getAppearanceFeatures(),
@@ -182,11 +197,12 @@ public class kNearestNeighbor {
 			float current_d_strcut = MSTFeatures.d_struct(inputGraph.getFeatures().getStrcuturalFeatures(),
 					proxy.getFeatures().getStrcuturalFeatures());
 
-			// quick reject, Graph construction and GED calculation only performed on relevant graphs
+			// quick reject, Graph construction and GED calculation only performed on
+			// relevant graphs
 			if (current_d_appear < average_d_appear || current_d_strcut < average_d_struct) {
 				// do resource heavy task of constructing ImageGraph
 				ImageGraph imageGraph = proxy.getGraph();
-				
+
 				// calculate how different it is from the new image
 				double distance = GED.calculateGraphEditDistance(inputGraph, imageGraph);
 				// store the type of image and the difference
@@ -251,8 +267,13 @@ public class kNearestNeighbor {
 				bestMatch = currentMatch;
 			}
 		}
-
 		return bestMatch;
+	}
+	
+	private void progress(double count, double numGraphs) {
+		double progress = ImageAnalyser.CURRENT_PROGRESS
+				+ (((++count / numGraphs) * ImageAnalyser.TOTAL_PROGRESS) * 0.8);
+		updateProgress.accept(progress, ImageAnalyser.TOTAL_PROGRESS);
 	}
 
 	/**
@@ -262,7 +283,7 @@ public class kNearestNeighbor {
 	 * @param category_TYPE the category of the reference data set
 	 * @return the average mst features
 	 */
-	public static MSTFeatures calcAverage(CATEGORY_TYPE category_TYPE) {
+	public MSTFeatures calcAverage(CATEGORY_TYPE category_TYPE) {
 		MSTFeatures averageFeatures = new MSTFeatures();
 		/*
 		 * initialize to smallest value, meaning if no reasonable average matches no GED

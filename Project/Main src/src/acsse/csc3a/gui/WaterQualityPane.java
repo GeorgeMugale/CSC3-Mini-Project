@@ -8,6 +8,8 @@ import acsse.csc3a.analyser.Result;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,6 +19,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -38,7 +41,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-
 public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 	private Button loadFolderButton;
@@ -50,7 +52,8 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 	private VBox thumbnailGallery;
 	public Button analyzeButton;
 	public static final String IMAGES_DIR = "data/images/";
-	
+	private ProgressBar progressBar;
+
 	public WaterQualityPane(Stage primaryStage) {
 
 		this.primaryStage = primaryStage;
@@ -81,9 +84,9 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 		loadThumbnails(new File(IMAGES_DIR));
 	}
-	
+
 	public void initLabelText() {
-		labelCatResults.setText("Analyzing image (this mat take a while)...");
+		labelCatResults.setText("Analyzing image (this may take a while)...");
 		labelMatchResults.setText("");
 		labelMatchResults.setTextFill(Color.BLACK);
 	}
@@ -154,19 +157,20 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 		labelCatResults = new Label("Select an image to analyze.");
 		labelCatResults.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-		
+
 		labelMatchResults = new Label("");
 		labelMatchResults.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
+		progressBar = new ProgressBar();
+
 		// You can make it indeterminate (spinning) or determinate (showing progress)
-		
-		VBox rightPane = new VBox(20, imagePane, analyzeButton, labelCatResults, labelMatchResults);
+
+		VBox rightPane = new VBox(20, imagePane, progressBar, analyzeButton, labelCatResults, labelMatchResults);
 		rightPane.setAlignment(Pos.BOTTOM_CENTER);
 		rightPane.setPadding(new Insets(20, 40, 20, 40));
 		this.setCenter(rightPane);
 
 	}
-
 
 	// Show full image on the right when thumbnail is clicked
 	private void showFullImage(String imagePath, MouseEvent event) {
@@ -219,6 +223,7 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 		alert.setHeaderText(null); // Optional: remove header
 		alert.setContentText(message);
 		alert.showAndWait();
+		progressBar.setVisible(true);
 	}
 
 	private void setHover(Node node) {
@@ -260,31 +265,76 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 		return bufferedImage;
 	}
-	
+
 	@Override
 	public void updateMatch(Result result) {
 		// TODO Auto-generated method stub
-		labelMatchResults.setText("Similarity detection complete: " + result.getQuality());
-		labelMatchResults.setTextFill(result.textColour());
+		Platform.runLater(() -> {
+			labelMatchResults.setText("Similarity detection complete: " + result.getQuality());
+			try {
+				labelMatchResults.setTextFill(result.textColour());
+				
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			
+		});
 	}
 
 	@Override
 	public void updateCat(Result result) {
 		// TODO Auto-generated method stub
-		labelCatResults.setText("Classification Complete: " + result.getCategory());
+		Platform.runLater(() -> {
+			labelCatResults.setText("Classification Complete: " + result.getCategory());
+		});
 	}
 
 	@Override
 	public void update(String result) {
 		// TODO Auto-generated method stub
-		
-		String[] tokens = result.split("---");
-		
-		AlertType updateType = tokens[0] == "ERR"? AlertType.ERROR : AlertType.INFORMATION;
-		
-		showMessage(tokens[1], tokens[2], updateType);
-		
+		Platform.runLater(() -> {
+			String[] tokens = result.split("---");
+
+			AlertType updateType = tokens[0] == "ERR" ? AlertType.ERROR : AlertType.INFORMATION;
+
+//	showMessage(tokens[1], tokens[2], updateType);
+		});
+
 	}
 
+	public void performTask(CallBack callback) {
+
+		analyzeButton.setDisable(true);
+		progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS); // show animation
+		progressBar.setVisible(true);
+		
+
+		initLabelText();
+
+		Task<Void> task = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				callback.apply(this::updateProgress);
+				return null;
+			}
+
+			@Override
+			protected void succeeded() {
+//				progressBar.setVisible(false);
+				analyzeButton.setDisable(false);
+			}
+
+			@Override
+			protected void failed() {
+				System.out.println("Task failed: " + getException());
+				progressBar.setVisible(false);
+			}
+		};
+
+		progressBar.progressProperty().bind(task.progressProperty());
+
+		new Thread(task).start();
+		System.out.println("all good");
+	}
 
 }

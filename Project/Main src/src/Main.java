@@ -1,5 +1,7 @@
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.scene.Scene;
+import javafx.scene.control.ProgressBar;
 import javafx.stage.*;
 
 import acsse.csc3a.gui.WaterQualityPane;
@@ -21,8 +23,9 @@ public class Main extends Application {
 		imageAnalyser.attach(root);
 
 		root.analyzeButton.setOnAction(e -> {
-			root.initLabelText();
-			imageAnalyser.analyze(root.getImage());
+			root.performTask((updateProgress) -> {
+				imageAnalyser.analyze(root.getImage(), updateProgress);
+			});
 		});
 
 		// Setup scene and stage

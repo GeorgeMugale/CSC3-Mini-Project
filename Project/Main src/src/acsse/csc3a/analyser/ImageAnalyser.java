@@ -2,12 +2,16 @@ package acsse.csc3a.analyser;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.function.BiConsumer;
 
 import acsse.csc3a.graph.algorithms.kNearestNeighbor;
 import acsse.csc3a.imagegraph.ImageGraph;
 import acsse.csc3a.io.ImageIterator;
 
 public class ImageAnalyser implements AbstractSubject {
+
+	public static Double TOTAL_PROGRESS = 10.0;
+	public static Double CURRENT_PROGRESS = 0.0;
 
 	private AbstractObserver observer;
 	private ImageGraph imageGraph;
@@ -45,19 +49,25 @@ public class ImageAnalyser implements AbstractSubject {
 			observer.update(result);
 	}
 
-	public void analyze(BufferedImage image /* , ProgressIndicator spinner */) {
+	public void analyze(BufferedImage image, BiConsumer<Double, Double> updateProgress) {
 		// TODO Auto-generated method stub
 
 		imageGraph = new ImageGraph(image);
 
-		notify("INFO---Graph Construction---Image has been converted to a graph successfully!");
+		
+		updateProgress.accept(++CURRENT_PROGRESS, TOTAL_PROGRESS);
+
+		notify("INFO---Graph Construction---Image has been converted to a graph successfully, \nclassifying and similiarity detection has begun!");
 
 		Result result = new Result();
 
+		kNearestNeighbor knn = new kNearestNeighbor(updateProgress);
+
 		try {
-			result.category_TYPE = kNearestNeighbor.classify(imageGraph, new ImageIterator(), 5);
+			result.category_TYPE = knn.classify(imageGraph, new ImageIterator(), 5);
 			this.notifyObserversCat(result);
-			result.match_TYPE = kNearestNeighbor.match(imageGraph, new ImageIterator(result.category_TYPE), 3);
+			updateProgress.accept(++CURRENT_PROGRESS, TOTAL_PROGRESS);
+			result.match_TYPE = knn.match(imageGraph, new ImageIterator(result.category_TYPE), 3);
 			this.notifyObserversMatch(result);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
