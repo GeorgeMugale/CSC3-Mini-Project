@@ -2,24 +2,24 @@ package acsse.csc3a.graph.algorithms;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-
 import acsse.csc3a.graph.Vertex;
 import acsse.csc3a.lists.ArrayList;
 import acsse.csc3a.map.Map;
 
+/**
+ * A class that efficiently represent an image graph, with (total edge weight,
+ * average edge weight, variance of edge weights, edge count) By means of
+ * observation these features can be effectively distinguish image
+ * classifications. 
+ * The goal is to use this class as a cheap filter before
+ * conducting expensive GED
+ */
 public class MSTFeatures implements Serializable {
 
 	/*
-	 * Training/ know dataset results 
-	 * meanTotal: 4516127.5 
-	 * stdTotal: 5961088.5
-	 * meanAvg: 133.4319 
-	 * stdAvg: 26.10389 
-	 * meanVar: 6503.956 
-	 * stdVar: 3798.0818
-	 * meanEdge: 34397.035 
-	 * stdEdge: 45944.926
+	 * Training/ know dataset results meanTotal: 4516127.5 stdTotal: 5961088.5
+	 * meanAvg: 133.4319 stdAvg: 26.10389 meanVar: 6503.956 stdVar: 3798.0818
+	 * meanEdge: 34397.035 stdEdge: 45944.926
 	 */
 	public static float meanTotal = 4516127.5f;
 	public static float stdTotal = 5961088.5f;
@@ -47,6 +47,12 @@ public class MSTFeatures implements Serializable {
 				+ "\nEdge Count: " + edgeCount + "\nDegree Map: " + degreeMap;
 	}
 
+	/**
+	 * Gets structural (container type) features of the MST
+	 * 
+	 * @return an f_struct instance with the corresponding structure features
+	 *         feature
+	 */
 	public f_struct getStrcuturalFeatures() {
 
 		f_struct feature = new f_struct();
@@ -57,6 +63,12 @@ public class MSTFeatures implements Serializable {
 		return feature;
 	}
 
+	/**
+	 * Gets appearance (water quality) features of the MST
+	 * 
+	 * @return an f_appear instance with the corresponding appearance features
+	 *         feature
+	 */
 	public f_appear getAppearanceFeatures() {
 		f_appear feature = new f_appear();
 
@@ -66,18 +78,50 @@ public class MSTFeatures implements Serializable {
 		return feature;
 	}
 
+	/**
+	 * Calculates the Euclidean distance between two points in 2D space.
+	 * 
+	 * @param x1 x-coordinate of the first point
+	 * @param x2 x-coordinate of the second point
+	 * @param y1 y-coordinate of the first point
+	 * @param y2 y-coordinate of the second point
+	 * @return The straight line distance between points (x1,y1) and (x2,y2)
+	 */
 	public static float euclideanDistance(float x1, float x2, float y1, float y2) {
-		return (float) Math.sqrt(Math.pow(x1 - x2, 2.00) + Math.pow(y1 - y2, 2.00));
+		float dx = x1 - x2;
+		float dy = y1 - y2;
+		return (float) Math.sqrt(dx * dx + dy * dy);
 	}
 
+	/**
+	 * Calculates Euclidean distance between appearance features
+	 * 
+	 * @param f_new the new graphs appearance features
+	 * @param f_ref the reference graphs appearance features
+	 * @return the distance between the two features
+	 */
 	public static float d_appear(f_appear f_new, f_appear f_ref) {
 		return euclideanDistance(f_new.totalWeight, f_ref.totalWeight, f_new.averageWeight, f_ref.averageWeight);
 	}
 
+	/**
+	 * Calculates Euclidean distance between structural features
+	 * 
+	 * @param f_new the new graphs structural features
+	 * @param f_ref the reference graphs structural features
+	 * @return the distance between the two features
+	 */
 	public static float d_struct(f_struct f_new, f_struct f_ref) {
 		return euclideanDistance(f_new.variance, f_ref.variance, f_new.edgeCount, f_ref.edgeCount);
 	}
 
+	/**
+	 * Calculates the distance between two MSTFeatures
+	 * 
+	 * @param f_new the new grap'hs features
+	 * @param f_ref the reference graphs's features
+	 * @return an class that represents the distance between the two MSTFeatures
+	 */
 	public static Distance calculateDistance(MSTFeatures f_new, MSTFeatures f_ref) {
 
 		f_appear f_appear_new = f_new.getAppearanceFeatures();
@@ -92,16 +136,25 @@ public class MSTFeatures implements Serializable {
 		return new Distance(d_appear, d_struct);
 	}
 
+	/**
+	 * A class that represents MST structural features
+	 */
 	protected static class f_struct {
 		public float variance;
 		public float edgeCount;
 	}
 
+	/**
+	 * A class that represents MST appearance features
+	 */
 	protected static class f_appear {
 		public float totalWeight;
 		public float averageWeight;
 	}
 
+	/**
+	 * This method normalizes the mst feature vector
+	 */
 	public void normalize() {
 		totalWeight = (totalWeight - meanTotal) / stdTotal;
 		averageWeight = (averageWeight - meanAvg) / stdAvg;
@@ -128,8 +181,20 @@ public class MSTFeatures implements Serializable {
 		}
 	}
 
+	/**
+	 * This class provides the service of normalization over the entire data set
+	 * feature vectors are centered around 0 with standard deviation being 1 
+	 * - This allows us to use thresholds on Euclidean distances between normalized MST
+	 * vectors for pre-filtering in a meaningful way when features have very
+	 * different ranges
+	 */
 	public static class MSTNormalizer {
 
+		/**
+		 * Calculates the standard deviation for the provided feature list
+		 * @param featuresList the list of MSTFeatures being calculated with
+		 * @return
+		 */
 		public static String getStardDeveations(List<MSTFeatures> featuresList) {
 			int n = featuresList.size();
 
@@ -146,7 +211,7 @@ public class MSTFeatures implements Serializable {
 					averageWeights[i] = f.averageWeight;
 					variances[i] = f.variance;
 					edgeCounts[i] = f.edgeCount;
-				} 
+				}
 			}
 
 			float meanTotal = calcMean(totalWeights);
@@ -161,6 +226,7 @@ public class MSTFeatures implements Serializable {
 			float meanEdge = calcMean(edgeCounts);
 			float stdEdge = calcStandardDeviation(edgeCounts, meanEdge);
 
+			// print the values out so they can be set as static class attributes
 			return String.format(
 					"\nmeanTotal: %s \nstdTotal: %s \nmeanAvg: %s \nstdAvg: %s \nmeanVar: %s \nstdVar: %s \nmeanEdge: %s \nstdEdge: %s",
 					meanTotal, stdTotal, meanAvg, stdAvg, meanVar, stdVar, meanEdge, stdEdge);

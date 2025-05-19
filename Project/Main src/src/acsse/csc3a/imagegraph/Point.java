@@ -3,11 +3,20 @@ package acsse.csc3a.imagegraph;
 import java.awt.Color;
 import java.io.Serializable;
 
+/**
+ * A point object which stores point properties and has behaviour for a point
+ */
 public class Point implements Serializable {
 	int x, y;
 	Color color;
 	float[] hsb;
 
+	/**
+	 * Constructs a point with the given position and colour
+	 * @param x x location of point
+	 * @param y y location of point
+	 * @param color color of point
+	 */
 	public Point(int x, int y, Color color) {
 		this.x = x;
 		this.y = y;
@@ -16,10 +25,20 @@ public class Point implements Serializable {
 		this.hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
 	}
 
+	/**
+	 * Gets the color of the point
+	 * @return the color
+	 */
 	public Color getColour() {
 		return color;
 	}
 
+	/**
+	 * Calculates the difference in color between two colors
+	 * @param color1 the first color
+	 * @param color2 the second color
+	 * @return the total of rgb differences
+	 */
 	public static float colorDifference(Color color1, Color color2) {
 		int dr = color1.getRed() - color2.getRed();
 		int dg = color1.getGreen() - color2.getGreen();
@@ -29,18 +48,13 @@ public class Point implements Serializable {
 		return (float) Math.sqrt(dr * dr + dg * dg + db * db + da * da);
 	}
 
+	/**
+	 * Calculates the opacity of the color of the point
+	 * @return the calculated opacity
+	 */
 	public int calculateWaterOpacity() {
-		// Water transparency correlates with:
-		// 1. Low saturation (washed-out colors)
-		// 2. High brightness (light colors)
-		// 3. Blue/green dominance
 
 		float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
-
-		// HSB components:
-		// hsb[0] = Hue (0=red, 0.33=green, 0.66=blue)
-		// hsb[1] = Saturation (0=gray, 1=vibrant)
-		// hsb[2] = Brightness (0=black, 1=white)
 
 		// Calculate "water opacity score" (0-255)
 		return (int) (255 * (0.6 * (1 - hsb[1]) + // Low saturation → more "transparent"
@@ -48,10 +62,18 @@ public class Point implements Serializable {
 		));
 	}
 
+	/**
+	 * Likelihood of weather this is a water pixel or not
+	 * @return true if it a water pixel, false otherwise
+	 */
 	public boolean isLikelyWater() {
 		return (hsb[0] >= 0.45 && hsb[0] <= 0.65); // Clean blue water
 	}
 
+	/**
+	 * Returns the quality of the pixel
+	 * @return a quality metric
+	 */
 	public double getQuality() {
 
 		float saturation = hsb[1];
@@ -70,21 +92,16 @@ public class Point implements Serializable {
 		}
 	}
 
-	/**
-	 * Compares the
-	 */
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;
 		if (!(o instanceof Point))
 			return false;
-		
+
 		Point point = (Point) o;
 		return x == point.x && y == point.y;
 	}
-	
-	
 
 	@Override
 	public int hashCode() {
@@ -95,18 +112,34 @@ public class Point implements Serializable {
 		return (int) (key ^ (key >>> 32));
 	}
 
+	/**
+	 * Gets the x location of the pixel
+	 * @return
+	 */
 	public int getX() {
 		return x;
 	}
-
+	
+	/**
+	 * Sets the x location of the pixel
+	 * @return
+	 */
 	public void setX(int x) {
 		this.x = x;
 	}
 
+	/**
+	 * Gets the Y location of the pixel
+	 * @return
+	 */
 	public int getY() {
 		return y;
 	}
 
+	/**
+	 * Sets the Y location of the pixel
+	 * @return
+	 */
 	public void setY(int y) {
 		this.y = y;
 	}
@@ -114,7 +147,6 @@ public class Point implements Serializable {
 	/**
 	 * Specialized function designed to convert 2D vertex coordinates (x, y) into a
 	 * well-distributed integer key so it may be used in the hash function.
-	 * 
 	 * @return
 	 */
 	@Override

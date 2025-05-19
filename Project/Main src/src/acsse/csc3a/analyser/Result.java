@@ -5,14 +5,26 @@ import acsse.csc3a.graph.algorithms.MATCH_TYPE;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+/**
+ * A class that encapsulates the value of the result of analyzing an image and
+ * desired functionality that come with those results
+ */
 public class Result {
+
 	public CATEGORY_TYPE category_TYPE = CATEGORY_TYPE.ONLY_WATER_TOP_VIEW;
 	public MATCH_TYPE match_TYPE = MATCH_TYPE.BLACK;
 
+	/**
+	 * Constructs a default result
+	 */
 	public Result() {
 
 	}
 
+	/**
+	 * Gets a string describing the category
+	 * @return the category the image was classified under
+	 */
 	public String getCategory() {
 		// TODO Auto-generated method stub
 
@@ -42,6 +54,10 @@ public class Result {
 		return result;
 	}
 
+	/**
+	 * Gets a string describing the quality
+	 * @return the match type which the image is most similar to
+	 */
 	public String getQuality() {
 		// TODO Auto-generated method stub
 
@@ -75,11 +91,15 @@ public class Result {
 		return result;
 	}
 
+	/**
+	 * The color which the response message should be
+	 * @return a Paint object of the color
+	 */
 	public Paint textColour() {
 		// TODO Auto-generated method stub
-		
+
 		Paint textFill;
-		
+
 		switch (match_TYPE) {
 		case GREEN: {
 			textFill = Color.GREEN;
@@ -104,7 +124,7 @@ public class Result {
 		default:
 			throw new IllegalArgumentException("Unexpected value: " + match_TYPE);
 		}
-		
+
 		return textFill;
 	}
 }

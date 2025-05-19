@@ -8,6 +8,9 @@ import acsse.csc3a.graph.algorithms.kNearestNeighbor;
 import acsse.csc3a.imagegraph.ImageGraph;
 import acsse.csc3a.io.ImageIterator;
 
+/**
+ * This class supports analyze water functionality which can be monitored
+ */
 public class ImageAnalyser implements AbstractSubject {
 
 	public static Double TOTAL_PROGRESS = 10.0;
@@ -49,33 +52,43 @@ public class ImageAnalyser implements AbstractSubject {
 			observer.update(result);
 	}
 
+	/**
+	 * This method analyzes an image to perform classification and similarity
+	 * detection
+	 * 
+	 * @param image          the image being analyzed
+	 * @param updateProgress Represents a functional interface which accepts a
+	 *                       method with a signature like the updateProdress method
+	 *                       of the {@link #Task} to allow monitoring of progress,
+	 *                       when the analyzing of water
+	 */
 	public void analyze(BufferedImage image, BiConsumer<Double, Double> updateProgress) {
 		// TODO Auto-generated method stub
 
-		imageGraph = new ImageGraph(image);
+		if (image != null) {
+			imageGraph = new ImageGraph(image);
 
-		
-		updateProgress.accept(++CURRENT_PROGRESS, TOTAL_PROGRESS);
-
-		notify("INFO---Graph Construction---Image has been converted to a graph successfully, \nclassifying and similiarity detection has begun!");
-
-		Result result = new Result();
-
-		kNearestNeighbor knn = new kNearestNeighbor(updateProgress);
-
-		try {
-			result.category_TYPE = knn.classify(imageGraph, new ImageIterator(), 5);
-			this.notifyObserversCat(result);
 			updateProgress.accept(++CURRENT_PROGRESS, TOTAL_PROGRESS);
-			result.match_TYPE = knn.match(imageGraph, new ImageIterator(result.category_TYPE), 3);
-			this.notifyObserversMatch(result);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			notify("ERR---Classficatio or Similarity detection error---" + e.getMessage());
-			e.printStackTrace();
-		}
 
-		;
+			notify("INFO---Graph Construction---Image has been converted to a graph successfully, \nclassifying and similiarity detection has begun!");
+
+			Result result = new Result();
+
+			kNearestNeighbor knn = new kNearestNeighbor(updateProgress);
+
+			try {
+				result.category_TYPE = knn.classify(imageGraph, new ImageIterator(), 5);
+				this.notifyObserversCat(result);
+				updateProgress.accept(++CURRENT_PROGRESS, TOTAL_PROGRESS);
+				result.match_TYPE = knn.match(imageGraph, new ImageIterator(result.category_TYPE), 3);
+				this.notifyObserversMatch(result);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				notify("ERR---Classficatio or Similarity detection error---" + e.getMessage());
+				e.printStackTrace();
+			}
+
+		}
 	}
 
 }

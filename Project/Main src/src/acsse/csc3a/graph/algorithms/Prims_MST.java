@@ -1,25 +1,10 @@
 package acsse.csc3a.graph.algorithms;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.security.KeyStore.Entry;
+
 import java.util.List;
-
-import javax.imageio.ImageIO;
-
 import acsse.csc3a.graph.Edge;
 import acsse.csc3a.graph.Graph;
 import acsse.csc3a.graph.Vertex;
-import acsse.csc3a.imagegraph.ImageGraph;
-import acsse.csc3a.imagegraph.Point;
 import acsse.csc3a.lists.ArrayList;
 import acsse.csc3a.lists.LinkedPositionalList;
 import acsse.csc3a.lists.PositionalList;
@@ -28,10 +13,17 @@ import acsse.csc3a.map.Map;
 import acsse.csc3a.priorityQueue.HeapPriorityQueue;
 import acsse.csc3a.priorityQueue.PriorityQueue;
 
+/**
+ * A class that calculates the MST of a graph as assigns the respective features to it
+ * @param <V> the Vertex type of the given graph
+ */
 public class Prims_MST<V> {
 
-	// MSTFeatures class to store the extracted features
-
+	/**
+	 * This method creates a MSTFeatures class object to store the extracted features
+	 * @param graph the graph being queried
+	 * @return the MTSFeature vector
+	 */
 	public MSTFeatures CalcMST(Graph<V, Float> graph) {
 
 		float Total_Weight = 0;

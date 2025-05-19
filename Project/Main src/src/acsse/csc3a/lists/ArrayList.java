@@ -22,6 +22,11 @@ public class ArrayList<T> implements List<T>, Iterable<T>, Serializable {
         this(strategy, 5);
     }
 
+    /**
+     * Constructs an arraylist which uses a specified strategy an with an initial size
+     * @param strategy the strategy the arraylist should use to grow when full
+     * @param arrayLength the length of the initial array
+     */
     @SuppressWarnings("unchecked")
     public ArrayList(char strategy, int arrayLength) {
         this.strategy = (strategy == 'A' || strategy == 'B') ? strategy : 'A';
@@ -30,6 +35,9 @@ public class ArrayList<T> implements List<T>, Iterable<T>, Serializable {
         this.size = 0;
     }
 
+    /**
+     * expands the array according to the provided strategy
+     */
     private void expandArray() {
         int newSize;
         switch (strategy) {
@@ -46,6 +54,11 @@ public class ArrayList<T> implements List<T>, Iterable<T>, Serializable {
         arrayLength = newSize;
     }
 
+    /**
+     * Checks if the index is within the array's bounds
+     * @param i the index being queried
+     * @param n the size being checked against
+     */
     private void checkIndex(int i, int n) {
         if (i < 0 || i >= n) throw new IndexOutOfBoundsException("Invalid index " + i);
     }

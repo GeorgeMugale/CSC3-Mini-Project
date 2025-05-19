@@ -35,17 +35,16 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 	 * higher-order bits.
 	 */
 	private long scale, shift;
-	
+
 	/**
-	 * The load factor threshold that determines when the hash table should be resized.
-	 * When the ratio of entries (n) to capacity exceeds this value, the table will
-	 * be expanded to maintain optimal performance.
+	 * The load factor threshold that determines when the hash table should be
+	 * resized. When the ratio of entries (n) to capacity exceeds this value, the
+	 * table will be expanded to maintain optimal performance.
 	 * 
-	 * A value of 0.5 means the table will resize when it becomes 50% full.
-	 * This provides a balance between memory usage and performance by:
-	 * - Reducing hash collisions before they become problematic
-	 * - Maintaining reasonable memory efficiency
-	 * - Keeping the average time complexity near O(1) for operations
+	 * A value of 0.5 means the table will resize when it becomes 50% full. This
+	 * provides a balance between memory usage and performance by: - Reducing hash
+	 * collisions before they become problematic - Maintaining reasonable memory
+	 * efficiency - Keeping the average time complexity near O(1) for operations
 	 */
 	private float loadFactor = 0.5f;
 
@@ -64,22 +63,22 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 	public AbstractMap(int capacity) {
 		this(capacity, 109345121);
 	}
-	
-	
+
 	/**
 	 * This method changes the load factor, which affectes how large the table grows
+	 * 
 	 * @param loadFactor
 	 */
 	public void updateLoadFactor(float loadFactor) {
 		if (loadFactor <= 0 || Float.isNaN(loadFactor))
-	        throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
-	    
-	    this.loadFactor = loadFactor;
-	    
-	    // Optional: resize if current load exceeds new factor
-	    if (n > capacity * loadFactor) {
-	        resize((int)(n / loadFactor) + 1);
-	    }
+			throw new IllegalArgumentException("Illegal load factor: " + loadFactor);
+
+		this.loadFactor = loadFactor;
+
+		// Optional: resize if current load exceeds new factor
+		if (n > capacity * loadFactor) {
+			resize((int) (n / loadFactor) + 1);
+		}
 	}
 
 	/**
@@ -125,8 +124,10 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 
 	@Override
 	public V put(K key, V value) {
-		// if the number of entries in the table more than half the capacity of the
-		// table
+		/*
+		 * if the number of entries in the table more than half the capacity of the
+		 * table
+		 */
 		if (n >= capacity * loadFactor) // Check before insertion to be more optimal
 			resize(2 * capacity - 1); // Resize if needed
 
@@ -139,44 +140,63 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 	 * @param newCapacity the size of the new table
 	 */
 	protected void resize(int newCapacity) {
-	    // Ensure new capacity is at least double and a prime number
-	    newCapacity = nextPrime(newCapacity);
-	    
-	    ArrayList<MapEntry<K, V>> buffer = new ArrayList<>(n);
-	    for (MapEntry<K, V> e : entrySet()) {
-	        buffer.add(e);
-	    }
+		// Ensure new capacity is at least double and a prime number
+		newCapacity = nextPrime(newCapacity);
 
-	    capacity = newCapacity;
-	    createTable();
-	    n = 0;
-	    
-	    for (MapEntry<K, V> e : buffer) {
-	        put(e.getKey(), e.getValue());
-	    }
+		ArrayList<MapEntry<K, V>> buffer = new ArrayList<>(n);
+		for (MapEntry<K, V> e : entrySet()) {
+			buffer.add(e);
+		}
+
+		capacity = newCapacity;
+		createTable();
+		n = 0;
+
+		for (MapEntry<K, V> e : buffer) {
+			put(e.getKey(), e.getValue());
+		}
 	}
 
-	// Helper method to find next prime number
+	/**
+	 * Returns the next prime number after a given input number
+	 * 
+	 * @param num the input number being queried
+	 * @return a prime number
+	 */
 	private int nextPrime(int num) {
-	    if (num <= 1) return 2;
-	    int prime = num;
-	    boolean found = false;
-	    while (!found) {
-	        prime++;
-	        if (isPrime(prime)) found = true;
-	    }
-	    return prime;
+		if (num <= 1)
+			return 2;
+		int prime = num;
+		boolean found = false;
+		while (!found) {
+			prime++;
+			if (isPrime(prime))
+				found = true;
+		}
+		return prime;
 	}
 
+	/**
+	 * Checks if the provided number is a prime number or not
+	 * 
+	 * @param num the number being queried
+	 * @return true if num is a prime number, false otherwise
+	 */
 	private boolean isPrime(int num) {
-	    if (num <= 1) return false;
-	    if (num == 2) return true;
-	    if (num % 2 == 0) return false;
-	    for (int i = 3; i * i <= num; i += 2) {
-	        if (num % i == 0) return false;
-	    }
-	    return true;
+		if (num <= 1)
+			return false;
+		if (num == 2)
+			return true;
+		if (num % 2 == 0)
+			return false;
+		// loop until half of the number
+		for (int i = 3; i * i <= num; i += 2) {
+			if (num % i == 0)
+				return false;
+		}
+		return true;
 	}
+
 	/**
 	 * Creates a hash value to determine the appropriate bucket based on the key
 	 * 
@@ -184,13 +204,12 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 	 * @return the appropriate bucket position in the tabel
 	 */
 	protected int hashValue(K key) {
-	    int h = key.hashCode();
-	    // Spread bits to avoid clustering
-	    h ^= (h >>> 20) ^ (h >>> 12);
-	    h ^= (h >>> 7) ^ (h >>> 4);
-	    return (int) ((Math.abs(h * scale + shift) % prime) % capacity);
+		int h = key.hashCode();
+		// Spread bits to avoid clustering
+		h ^= (h >>> 20) ^ (h >>> 12);
+		h ^= (h >>> 7) ^ (h >>> 4);
+		return (int) ((Math.abs(h * scale + shift) % prime) % capacity);
 	}
-
 
 	/**
 	 * This method should create an initially empty table having size equal to a
@@ -256,6 +275,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 	 * @param key the key being checked
 	 * @return true if the key is within the map, false otherwise
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean containsKey(Object key) {
 		// TODO Auto-generated method stub
 		return bucketGet(hashValue((K) key), (K) key) != null;
@@ -301,8 +321,10 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 		 * @F UnsupportedOperationException always because we are not allowed to remove
 		 */
 		public void remove() throws UnsupportedOperationException {
-			// To maintain consistency with the underlying map structure we prevent
-			// modification
+			/*
+			 * To maintain consistency with the underlying map structure we prevent
+			 * modification
+			 */
 			throw new UnsupportedOperationException("Remove not supported via KeyIterator");
 		}
 	}
@@ -326,11 +348,7 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	/**
-	 * Provides an alternative key iteration view (alias for keySet())
-	 * 
-	 * @return an iterable view of the map's keys (alternative accessor)
-	 */
+	@Override
 	public Iterable<K> keySet() {
 		return new KeyIterable();
 	}
@@ -402,8 +420,11 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 		return new ValueIterable();
 	}
 
-	/*
+	
+	/**
 	 * composition design pattern used to keep track of both an element and its key
+	 * @param <K> the type of the key which maps to an element
+	 * @param <V> the type of value mapping from the key
 	 */
 	protected class MapEntry<K, V> implements Serializable, Entry<K, V> {
 		/**
@@ -477,13 +498,13 @@ public abstract class AbstractMap<K, V> implements Map<K, V> {
 			// TODO Auto-generated method stub
 			return String.format("{Key: %s Value: %s}", k, v);
 		}
-		
+
 		@Override
 		public int hashCode() {
 			// TODO Auto-generated method stub
 			return k.hashCode();
 		}
-		
+
 	}
 
 }

@@ -1,12 +1,6 @@
 package acsse.csc3a.graph;
 
-import java.awt.Color;
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
-import acsse.csc3a.imagegraph.ImageGraph;
-import acsse.csc3a.imagegraph.Point;
 import acsse.csc3a.lists.LinkedPositionalList;
 import acsse.csc3a.lists.PositionalList;
 import acsse.csc3a.map.AbstractMap;
@@ -16,19 +10,24 @@ import acsse.csc3a.lists.Position;
 /**
  * A graph that is implemented using an adjacency map
  * 
- * @param <V> the vertex
- * @param <E> the edge
+ * @param <V> the type the vertex will hold
+ * @param <E> the type the edge will hold
  */
 public class AdjacencyMapGraph<V, E> implements Graph<V, E> {
 
-	/*
-	 * class for the vertex of the graph
+	/**
+	 * A class for the vertex representation of the graph
+	 * @param <V>
 	 */
 	private class InnerVertex<V> implements Vertex<V> {
 		private V element;
 		transient private Position<Vertex<V>> position;
 		transient private AbstractMap<Vertex<V>, Edge<E>> incidenceMap;
 
+		/**
+		 * Constructs a vertex containing the specified element
+		 * @param element the element being stored
+		 */
 		public InnerVertex(V element) {
 			this.element = element;
 			/*
@@ -43,14 +42,26 @@ public class AdjacencyMapGraph<V, E> implements Graph<V, E> {
 			return element;
 		}
 
+		/**
+		 * Stores the position of this vertex within the graph's vertex list
+		 * @param p the position within the graphs vertex list
+		 */
 		public void setPosition(Position<Vertex<V>> p) {
 			position = p;
 		}
 
+		/**
+		 * Gets the position of this vertex within the graph's vertex list
+		 * @return the position within the graphs vertex list
+		 */
 		public Position<Vertex<V>> getPosition() {
 			return position;
 		}
 
+		/** 
+		 * Gets all edges incident to this vertex
+		 * @return reference to the underlying map of all edges
+		 */
 		public AbstractMap<Vertex<V>, Edge<E>> getIncidenceMap() {
 			return incidenceMap;
 		}
@@ -65,14 +76,12 @@ public class AdjacencyMapGraph<V, E> implements Graph<V, E> {
 		@Override
 		public boolean equals(Object obj) {
 			// TODO Auto-generated method stub
-			return element.equals(((Vertex) obj).getElement());
+			return element.equals(((Vertex<V>) obj).getElement());
 		}
-		
-		
+
 		@Override
 		public int hashCode() {
 			// TODO Auto-generated method stub
-			
 			return element.hashCode();
 		}
 	}
@@ -85,6 +94,13 @@ public class AdjacencyMapGraph<V, E> implements Graph<V, E> {
 		private Position<Edge<E>> position;
 		private Vertex<V>[] endpoints;
 
+		/**
+		 * Constructs an edge instance with its value and associated vertices from u to v
+		 * @param u the first associated vertex
+		 * @param v the second associated vertex
+		 * @param element the value of the edge between the vertecies
+		 */
+		@SuppressWarnings("unchecked")
 		public InnerEdge(Vertex<V> u, Vertex<V> v, E element) {
 			this.element = element;
 			endpoints = (Vertex<V>[]) new Vertex[] { u, v };
@@ -115,15 +131,14 @@ public class AdjacencyMapGraph<V, E> implements Graph<V, E> {
 		public Position<Edge<E>> getPosition() {
 			return position;
 		}
-		
+
 		@SuppressWarnings("unchecked")
 		@Override
 		public boolean equals(Object obj) {
-			// TODO Auto-generated method stub	
-			return element.equals(((Edge) obj).getElement());
+			// TODO Auto-generated method stub
+			return element.equals(((Edge<E>) obj).getElement());
 		}
-		
-		
+
 		@Override
 		public int hashCode() {
 			// TODO Auto-generated method stub
@@ -266,31 +281,4 @@ public class AdjacencyMapGraph<V, E> implements Graph<V, E> {
 		return edges;
 	}
 
-	
-	
-
-	
-	public static void main(String[] args) {
-		
-		AdjacencyMap<Vertex<Point>, Integer> map = new AdjacencyMap<>();
-		
-		AdjacencyMapGraph<Point, String> graph = new AdjacencyMapGraph<>();
-		
-		AdjacencyMapGraph<Point, String>.InnerVertex<Point> vertex = 
-			    graph.new InnerVertex<Point>(new Point(0, 0, new Color(0)));
-		AdjacencyMapGraph<Point, String>.InnerVertex<Point> vertex2 = 
-			    graph.new InnerVertex<Point>(new Point(1, 0, new Color(1)));
-		
-		AdjacencyMapGraph<Point, String>.InnerVertex<Point> vertex4 = 
-			    graph.new InnerVertex<Point>(new Point(0, 10, new Color(1)));
-		
-		map.put(vertex, 1);
-		map.put(vertex2, 0);
-		map.put(vertex4, 2);
-		
-		
-		System.out.println(map.get(vertex4));
-	}
-	
-	
 }

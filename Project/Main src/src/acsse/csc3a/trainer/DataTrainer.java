@@ -200,6 +200,13 @@ public class DataTrainer {
 		}
 	}
 
+	/**
+	 * run these methods when ever the data set changes to prevent the normalization
+	 * from wrongly classify the new graphs as highly anomalous, even if they're
+	 * not.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 
 		// precompute msts

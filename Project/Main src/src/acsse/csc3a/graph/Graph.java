@@ -2,6 +2,11 @@ package acsse.csc3a.graph;
 
 import java.io.Serializable;
 
+/**
+ * An interface that stipulates functionality a graph must realize
+ * @param <V> the tye which the vertex stores
+ * @param <E> the type which the edge stores
+ */
 public interface Graph<V, E> extends Serializable {
 
 	/**
