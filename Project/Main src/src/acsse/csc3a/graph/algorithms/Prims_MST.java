@@ -121,6 +121,8 @@ public class Prims_MST<V> {
 		features.variance = features.edgeCount > 0 ? variance / features.edgeCount : 0f;
 
 		System.out.println("MST contains " + mst.size() + " edges");
+		
+		features.degreeMap = null;
 		return features;
 	}
 

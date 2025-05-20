@@ -100,4 +100,10 @@ public class ImageGraphProxy implements AbstractImageGraphProxy {
 		return graph;
 	}
 
+	@Override
+	public File getFile() {
+		// TODO Auto-generated method stub
+		return file;
+	}
+
 }

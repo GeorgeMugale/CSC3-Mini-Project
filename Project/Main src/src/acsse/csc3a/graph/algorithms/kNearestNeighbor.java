@@ -188,7 +188,7 @@ public class kNearestNeighbor {
 		while (referenceGraphs.hasNext()) {
 			// get the current image graph proxy from the reference data set
 			AbstractImageGraphProxy proxy = referenceGraphs.next();
-			
+
 			progress(++count, numGraphs);
 
 			// calculate the distance
@@ -196,12 +196,15 @@ public class kNearestNeighbor {
 					proxy.getFeatures().getAppearanceFeatures());
 			float current_d_strcut = MSTFeatures.d_struct(inputGraph.getFeatures().getStrcuturalFeatures(),
 					proxy.getFeatures().getStrcuturalFeatures());
-
-			// quick reject, Graph construction and GED calculation only performed on
-			// relevant graphs
+		
+			/*
+			 * quick reject, Graph construction and GED calculation only performed on
+			 * relevant graphs
+			 */
 			if (current_d_appear < average_d_appear || current_d_strcut < average_d_struct) {
+				
 				// do resource heavy task of constructing ImageGraph
-				ImageGraph imageGraph = proxy.getGraph();
+				ImageGraph imageGraph = proxy.getGraph();	
 
 				// calculate how different it is from the new image
 				double distance = GED.calculateGraphEditDistance(inputGraph, imageGraph);
@@ -269,7 +272,7 @@ public class kNearestNeighbor {
 		}
 		return bestMatch;
 	}
-	
+
 	private void progress(double count, double numGraphs) {
 		double progress = ImageAnalyser.CURRENT_PROGRESS
 				+ (((++count / numGraphs) * ImageAnalyser.TOTAL_PROGRESS) * 0.8);

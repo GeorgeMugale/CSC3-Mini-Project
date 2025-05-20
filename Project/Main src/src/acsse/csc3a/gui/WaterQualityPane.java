@@ -207,6 +207,7 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 
 		// create a progress bar instance
 		progressBar = new ProgressBar();
+		progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
 
 		// add controlls to the right pane
 		VBox rightPane = new VBox(20, imagePane, progressBar, analyzeButton, labelCatResults, labelMatchResults);
@@ -399,7 +400,6 @@ public class WaterQualityPane extends BorderPane implements AbstractObserver {
 	public void performTask(CallBack callback) {
 
 		analyzeButton.setDisable(true);
-		progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS); // show animation
 		progressBar.setVisible(true);
 
 		initLabelText();

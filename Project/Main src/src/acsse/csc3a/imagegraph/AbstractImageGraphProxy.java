@@ -1,5 +1,7 @@
 package acsse.csc3a.imagegraph;
 
+import java.io.File;
+
 /**
  * This interface outlines the essential behavior if creating an ImageGraph
  * which each class that realizes it must support
@@ -12,5 +14,7 @@ public interface AbstractImageGraphProxy extends GraphFeatureSource {
 	 * @return an image graph
 	 */
 	public ImageGraph getGraph();
+	
+	public File getFile();
 
 }
