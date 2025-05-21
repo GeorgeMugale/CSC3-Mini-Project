@@ -94,7 +94,6 @@ public class DataTrainer {
 
 					features.category_TYPE = graph.getWaterImageType();
 					features.match_TYPE = graph.getLabel();
-					features.degreeMap = null;
 
 					graph = null;
 					System.gc();
@@ -173,7 +172,6 @@ public class DataTrainer {
 			for (String key : ImageIterator.mstFeatures.keySet()) {
 
 				MSTFeatures feature = ImageIterator.mstFeatures.get(key);
-
 				feature.normalize();
 
 			}
@@ -225,10 +223,11 @@ public class DataTrainer {
 
 		// normalize precomputed msts features for entire data set, only after manually
 		// changing means and std devs
-		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.ONLY_WATER_SIDE_VIEW);
-		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.ONLY_WATER_TOP_VIEW);
-		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_OPAQUE);
-		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_TRANSPARENT);
+//		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.ONLY_WATER_SIDE_VIEW);
+//		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.ONLY_WATER_TOP_VIEW);
+//		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_OPAQUE);
+//		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_TRANSPARENT);
+
 
 	}
 

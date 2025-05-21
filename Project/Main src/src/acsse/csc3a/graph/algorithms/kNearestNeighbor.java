@@ -79,6 +79,7 @@ public class kNearestNeighbor {
 		inputGraph.setFeatures(MST.CalcMST(inputGraph.getGraph()));
 		inputGraph.getFeatures().normalize();
 
+		System.out.println("kclasses");
 		/*
 		 * calculate the distance between the mst features of the reference graphs and
 		 * the new image graph
@@ -86,13 +87,19 @@ public class kNearestNeighbor {
 		while (referenceGraphs.hasNextMSTFeature()) {
 			MSTFeatures currentFeature = referenceGraphs.nextFeature();
 			if (currentFeature != null) {
-				classificationList.addLast(new KClass<CATEGORY_TYPE, Distance>(currentFeature.category_TYPE,
-						MSTFeatures.calculateDistance(inputGraph.getFeatures(), currentFeature)));
+				Distance distance = MSTFeatures.calculateDistance(inputGraph.getFeatures(), currentFeature, true);
+				KClass<CATEGORY_TYPE, Distance> kClass = new KClass<>(currentFeature.category_TYPE, distance);
+
+				classificationList.addLast(kClass);
+
+				System.out.println(kClass);
+
 			}
 		}
 		// close all references in the stream and for call garbage collector
 		referenceGraphs.close();
 
+		System.out.println("k of them....");
 		// sort the classified list
 		Collections.sort(classificationList);
 
@@ -108,9 +115,14 @@ public class kNearestNeighbor {
 		// add the labels and the votes
 		for (KClass<CATEGORY_TYPE, Distance> kClass : classificationList) {
 			Integer currentFrequency = frequencyMap.get(kClass.label);
+			System.out.println("label: " + kClass.label);
+			System.out.println("distance: app(" + kClass.distance.d_appear + ") str(" + kClass.distance.d_struct + ")");
+
 			// if it is a new entry
 			if (currentFrequency == null) {
 				frequencyMap.put(kClass.label, 1);
+			} else {
+				frequencyMap.put(kClass.label, ++currentFrequency);
 			}
 		}
 
@@ -173,10 +185,7 @@ public class kNearestNeighbor {
 		MSTFeatures avgFeatures = calcAverage(referenceGraphs.getCategory());
 
 		// calculate average distance
-		float average_d_appear = MSTFeatures.d_appear(inputGraph.getFeatures().getAppearanceFeatures(),
-				avgFeatures.getAppearanceFeatures());
-		float average_d_struct = MSTFeatures.d_struct(inputGraph.getFeatures().getStrcuturalFeatures(),
-				avgFeatures.getStrcuturalFeatures());
+		Distance averageDistance = MSTFeatures.calculateDistance(inputGraph.getFeatures(), avgFeatures, false);
 
 		double count = 0.00;
 		double numGraphs = (double) referenceGraphs.count();
@@ -192,19 +201,17 @@ public class kNearestNeighbor {
 			progress(++count, numGraphs);
 
 			// calculate the distance
-			float current_d_appear = MSTFeatures.d_appear(inputGraph.getFeatures().getAppearanceFeatures(),
-					proxy.getFeatures().getAppearanceFeatures());
-			float current_d_strcut = MSTFeatures.d_struct(inputGraph.getFeatures().getStrcuturalFeatures(),
-					proxy.getFeatures().getStrcuturalFeatures());
-		
+			Distance currentDistance = MSTFeatures.calculateDistance(inputGraph.getFeatures(), proxy.getFeatures(),
+					false);
+
 			/*
 			 * quick reject, Graph construction and GED calculation only performed on
 			 * relevant graphs
 			 */
-			if (current_d_appear < average_d_appear || current_d_strcut < average_d_struct) {
-				
+			if (currentDistance.compareTo(averageDistance) != 1) {
+
 				// do resource heavy task of constructing ImageGraph
-				ImageGraph imageGraph = proxy.getGraph();	
+				ImageGraph imageGraph = proxy.getGraph();
 
 				// calculate how different it is from the new image
 				double distance = GED.calculateGraphEditDistance(inputGraph, imageGraph);

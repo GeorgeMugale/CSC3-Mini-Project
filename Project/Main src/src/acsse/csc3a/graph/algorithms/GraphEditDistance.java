@@ -161,10 +161,10 @@ public class GraphEditDistance {
 		
 		if (vertexA.isLikelyWater() && vertexB.isLikelyWater()) {
 			// if both are likely water let the cost be less
-			return colourDifference * VERTEX_SUBSTITUTION_COST_NA;
+			return colourDifference * VERTEX_SUBSTITUTION_COST;
 		} else {
 			// if not likely water make the cost more
-			return colourDifference * VERTEX_SUBSTITUTION_COST;
+			return colourDifference * VERTEX_SUBSTITUTION_COST_NA;
 		}
 	}
 

@@ -118,7 +118,7 @@ public class Result {
 			break;
 		}
 		case YELLOW: {
-			textFill = Color.YELLOW;
+			textFill = Color.GOLDENROD;
 			break;
 		}
 		default:

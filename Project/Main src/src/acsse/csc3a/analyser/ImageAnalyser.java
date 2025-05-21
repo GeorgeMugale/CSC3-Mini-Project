@@ -64,6 +64,9 @@ public class ImageAnalyser implements AbstractSubject {
 	 */
 	public void analyze(BufferedImage image, BiConsumer<Double, Double> updateProgress) {
 		// TODO Auto-generated method stub
+		
+		CURRENT_PROGRESS = 0.0;
+		updateProgress.accept(CURRENT_PROGRESS, TOTAL_PROGRESS);
 
 		if (image != null) {
 			imageGraph = new ImageGraph(image);
@@ -82,6 +85,7 @@ public class ImageAnalyser implements AbstractSubject {
 				updateProgress.accept(++CURRENT_PROGRESS, TOTAL_PROGRESS);
 				result.match_TYPE = knn.match(imageGraph, new ImageIterator(result.category_TYPE), 3);
 				this.notifyObserversMatch(result);
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				notify("ERR---Classficatio or Similarity detection error---" + e.getMessage());
@@ -89,6 +93,7 @@ public class ImageAnalyser implements AbstractSubject {
 			}
 
 		}
+
 	}
 
 }

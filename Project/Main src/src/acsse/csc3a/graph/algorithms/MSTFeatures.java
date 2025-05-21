@@ -10,28 +10,45 @@ import acsse.csc3a.map.Map;
  * A class that efficiently represent an image graph, with (total edge weight,
  * average edge weight, variance of edge weights, edge count) By means of
  * observation these features can be effectively distinguish image
- * classifications. 
- * The goal is to use this class as a cheap filter before
+ * classifications. The goal is to use this class as a cheap filter before
  * conducting expensive GED
  */
 public class MSTFeatures implements Serializable {
 
 	/*
-	 * Training/ know dataset results meanTotal: 4516127.5 stdTotal: 5961088.5
-	 * meanAvg: 133.4319 stdAvg: 26.10389 meanVar: 6503.956 stdVar: 3798.0818
-	 * meanEdge: 34397.035 stdEdge: 45944.926
+	 * Training/ know dataset results 
+	 * meanTotal: 4728985.5 
+	 * stdTotal: 6157847.0
+	 * meanAvg: 133.01503 
+	 * stdAvg: 24.897089 
+	 * meanVar: 6352.674 
+	 * stdVar: 3422.122
+	 * meanEdge: 35972.19 
+	 * stdEdge: 45858.258
 	 */
-	public static float meanTotal = 4516127.5f;
-	public static float stdTotal = 5961088.5f;
+//	public static float meanTotal = 4728985.5f;
+//	public static float stdTotal = 6157847.0f;
+//
+//	public static float meanAvg = 133.01503f;
+//	public static float stdAvg = 24.897089f;
+//
+//	public static float meanVar = 6352.674f;
+//	public static float stdVar = 3422.122f;
+//
+//	public static float meanEdge = 35972.19f;
+//	public static float stdEdge = 45858.258f;
+	
+	public static float meanTotal = 5816869.5f;
+	public static float stdTotal = 6845017.5f;
 
-	public static float meanAvg = 133.4319f;
-	public static float stdAvg = 26.10389f;
+	public static float meanAvg = 132.75655f;
+	public static float stdAvg = 26.181938f;
 
-	public static float meanVar = 6503.956f;
-	public static float stdVar = 3798.0818f;
+	public static float meanVar = 6436.2017f;
+	public static float stdVar = 3788.474f;
 
-	public static float meanEdge = 34397.035f;
-	public static float stdEdge = 45944.926f;
+	public static float meanEdge = 44666.05f;
+	public static float stdEdge = 52473.773f;
 
 	public float totalWeight;
 	public float averageWeight;
@@ -122,7 +139,7 @@ public class MSTFeatures implements Serializable {
 	 * @param f_ref the reference graphs's features
 	 * @return an class that represents the distance between the two MSTFeatures
 	 */
-	public static Distance calculateDistance(MSTFeatures f_new, MSTFeatures f_ref) {
+	public static Distance calculateDistance(MSTFeatures f_new, MSTFeatures f_ref, boolean struct) {
 
 		f_appear f_appear_new = f_new.getAppearanceFeatures();
 		f_appear f_appear_ref = f_ref.getAppearanceFeatures();
@@ -133,7 +150,7 @@ public class MSTFeatures implements Serializable {
 		float d_appear = d_appear(f_appear_new, f_appear_ref);
 		float d_struct = d_struct(f_struct_new, f_struct_ref);
 
-		return new Distance(d_appear, d_struct);
+		return new Distance(d_appear, d_struct, struct);
 	}
 
 	/**
@@ -156,35 +173,59 @@ public class MSTFeatures implements Serializable {
 	 * This method normalizes the mst feature vector
 	 */
 	public void normalize() {
+		
+//		System.out.printf("(%s - %s) / %s = %s",totalWeight, meanTotal, stdTotal, (totalWeight - meanTotal) / stdTotal);
 		totalWeight = (totalWeight - meanTotal) / stdTotal;
+		
 		averageWeight = (averageWeight - meanAvg) / stdAvg;
 		variance = (variance - meanVar) / stdVar;
 		edgeCount = Math.round((edgeCount - meanEdge) / stdEdge);
 	}
 
+	/**
+	 * A class that provides a standard way of comparing mst feature distances
+	 */
 	protected static class Distance implements Comparable<Distance> {
 		public float d_appear;
 		public float d_struct;
+		public boolean struct;
 
-		public Distance(float d_appear, float d_struct) {
+		public Distance(float d_appear, float d_struct, boolean struct) {
 			this.d_appear = d_appear;
 			this.d_struct = d_struct;
+			this.struct = struct;
 		}
 
 		@Override
 		public int compareTo(Distance o) {
 			// TODO Auto-generated method stub
-			float thisWeighted = 0.7f * this.d_struct + 0.3f * this.d_appear;
-			float otherWeighted = 0.7f * o.d_struct + 0.3f * o.d_appear;
+
+			float structWeight = 0.7f;
+			float appearWeight = 0.3f;
+
+			if (!struct) {
+				structWeight = 0.3f;
+				appearWeight = 0.7f;
+			}
+
+			float thisWeighted = structWeight * this.d_struct + appearWeight * this.d_appear;
+			float otherWeighted = structWeight * o.d_struct + appearWeight * o.d_appear;
 			return Float.compare(thisWeighted, otherWeighted);
 
 		}
+
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return String.format("Distance{appear: %s struct: %s}", d_appear, d_struct);
+		}
+
 	}
 
 	/**
 	 * This class provides the service of normalization over the entire data set
-	 * feature vectors are centered around 0 with standard deviation being 1 
-	 * - This allows us to use thresholds on Euclidean distances between normalized MST
+	 * feature vectors are centered around 0 with standard deviation being 1. This
+	 * allows us to use thresholds on Euclidean distances between normalized MST
 	 * vectors for pre-filtering in a meaningful way when features have very
 	 * different ranges
 	 */
@@ -192,6 +233,7 @@ public class MSTFeatures implements Serializable {
 
 		/**
 		 * Calculates the standard deviation for the provided feature list
+		 * 
 		 * @param featuresList the list of MSTFeatures being calculated with
 		 * @return
 		 */
@@ -275,13 +317,15 @@ public class MSTFeatures implements Serializable {
 			// Step 3: Normalize each feature
 			List<MSTFeatures> normalized = new ArrayList<>();
 			for (MSTFeatures f : featuresList) {
-				MSTFeatures norm = new MSTFeatures();
-				norm.totalWeight = (f.totalWeight - meanTotal) / stdTotal;
-				norm.averageWeight = (f.averageWeight - meanAvg) / stdAvg;
-				norm.variance = (f.variance - meanVar) / stdVar;
-				norm.edgeCount = Math.round((f.edgeCount - meanEdge) / stdEdge);
+				if (f != null) {
+					MSTFeatures norm = new MSTFeatures();
+					norm.totalWeight = (f.totalWeight - meanTotal) / stdTotal;
+					norm.averageWeight = (f.averageWeight - meanAvg) / stdAvg;
+					norm.variance = (f.variance - meanVar) / stdVar;
+					norm.edgeCount = Math.round((f.edgeCount - meanEdge) / stdEdge);
 
-				normalized.add(norm);
+					normalized.add(norm);
+				}
 			}
 
 			System.out.printf(
@@ -293,7 +337,7 @@ public class MSTFeatures implements Serializable {
 
 		/**
 		 * This method takes a new MSTFeature an normalizes its values so it can be used
-		 * for subsequent calculations with the trained data (whihc is also normalized)
+		 * for subsequent calculations with the trained data (which is also normalized)
 		 * 
 		 * @param newMST new mts feature being normalized
 		 * @return a normalized mstFeature
@@ -344,7 +388,8 @@ public class MSTFeatures implements Serializable {
 
 			double sum = 0.0;
 			for (T num : values) {
-				sum += Math.pow(num.doubleValue() - mean, 2);
+				if (num != null)
+					sum += Math.pow(num.doubleValue() - mean, 2);
 			}
 			return (float) Math.sqrt(sum / values.length);
 		}
