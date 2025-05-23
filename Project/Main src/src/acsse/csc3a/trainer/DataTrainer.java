@@ -15,6 +15,7 @@ import acsse.csc3a.graph.algorithms.MATCH_TYPE;
 import acsse.csc3a.graph.algorithms.MSTFeatures;
 import acsse.csc3a.graph.algorithms.MSTFeatures.MSTNormalizer;
 import acsse.csc3a.graph.algorithms.Prims_MST;
+import acsse.csc3a.imagegraph.AbstractImageGraphProxy;
 import acsse.csc3a.imagegraph.ImageGraph;
 import acsse.csc3a.imagegraph.Point;
 import acsse.csc3a.io.ImageIterator;
@@ -227,6 +228,23 @@ public class DataTrainer {
 //		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.ONLY_WATER_TOP_VIEW);
 //		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_OPAQUE);
 //		normalizePrecomputedMSTFeatures(CATEGORY_TYPE.WATER_IN_TRANSPARENT);
+		
+		try (ImageIterator iterator = new ImageIterator()){
+			
+			while (iterator.hasNext()) {
+				AbstractImageGraphProxy fet = iterator.next();
+				
+				System.out.printf("\nFile Name: %s", fet.getFile().getName());
+				System.out.println();
+				System.out.printf("Classify: %s Similar To: %s", fet.getFeatures().category_TYPE, fet.getFeatures().match_TYPE);
+				System.out.println();
+				System.out.printf("MST Features: \n%s", fet.getFeatures());	
+				
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 
 	}

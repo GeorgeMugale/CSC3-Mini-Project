@@ -30,7 +30,7 @@ public class Main extends Application {
 
 		// Setup scene and stage
 		Scene scene = new Scene(root, 900, 550);
-		String css = getClass().getResource("./style.css").toExternalForm();
+		String css = getClass().getResource("style.css").toExternalForm();
 		scene.getStylesheets().add(css);
 
 		primaryStage.setScene(scene);

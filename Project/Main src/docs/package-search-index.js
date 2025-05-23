@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"acsse.csc3a.analyser"},{"l":"acsse.csc3a.graph"},{"l":"acsse.csc3a.graph.algorithms"},{"l":"acsse.csc3a.gui"},{"l":"acsse.csc3a.imagegraph"},{"l":"acsse.csc3a.io"},{"l":"acsse.csc3a.lists"},{"l":"acsse.csc3a.map"},{"l":"acsse.csc3a.priorityQueue"},{"l":"acsse.csc3a.trainer"},{"l":"All Packages","u":"allpackages-index.html"}];updateSearchResults();

@@ -1,7 +1,13 @@
 package acsse.csc3a.graph;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import acsse.csc3a.imagegraph.ImageGraph;
 import acsse.csc3a.imagegraph.Point;
 
 public class GraphPrinter extends JPanel {
@@ -45,4 +51,32 @@ public class GraphPrinter extends JPanel {
         frame.add(new GraphPrinter(graph));
         frame.setVisible(true);
     }
+    
+    
+    public static void main(String[] args) {
+    	
+    	
+    	File file = new File("C:\\Users\\GEORGE MUGALE\\Desktop\\CS3 Mini Project\\CS3 Mini Project\\Project\\Main src\\data\\reference-data\\ONLY_WATER_TOP_VIEW\\360_F_81381061_bWZNA5A4G6ru9tnG61gTV0U8ub0nHBMi.jpg");
+		
+    	BufferedImage image;
+		try {
+			image = ImageIO.read(file);
+			ImageGraph graph = new ImageGraph(image);
+			
+			GraphPrinter printer = new GraphPrinter(graph.getGraph());
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	
+    	
+    	
+    	
+	}
+    
+    
 }
