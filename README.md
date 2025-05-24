@@ -257,9 +257,9 @@ To run the **WaterQualityAnalyzer** program, follow these steps:
 
 # Results
 The images bellow are the results of running our program.
-[!result 1](./Project/image1.png)
-[!result 2](./Project/image2.png)
-[!result 3](./Project/image3.png)
+![result 1](./Project/image1.png)
+![result 2](./Project/image2.png)
+![result 3](./Project/image3.png)
 
 # References
 ## Data Structures and Algorithms
