@@ -33,6 +33,7 @@
   - [Similarity](#similarity)
     - [Weighted votes](#weighted-votes)
     - [Alpha based Similarity Detection](#alpha-based-similarity-detection)
+  - [Conclusion](#conclusion)
 - [References](#references)
   - [Data Structures and Algorithms](#data-structures-and-algorithms)
   - [Robin Hood Hashing](#robin-hood-hashing)
@@ -156,7 +157,6 @@ This design choice reduces coupling between the analysis logic and the GUI threa
 This approach is interesting because, from a strict Object-Oriented Programming (OOP) perspective, it somewhat breaks traditional visibility and encapsulation principles by externally passing a protected method (**updateProgress**) as a functional interface into other classes. In Java, a language known for its strong emphasis on OOP and access control, methods like **updateProgress** are typically hidden from outside access to preserve encapsulation. Yet, by treating this method as an instance variable (via a **BiConsumer**), we essentially expose internal behavior in a controlled way, allowing classes like our KNN analyzer to invoke it without violating the class’s intended boundaries too severely. Despite being an old-fashioned workaround, I found it fascinating that Java’s flexible functional interface system enables this pattern, blending functional programming styles with OOP to achieve clean, decoupled code.
 
 
-
 # Core Functions
 Now comes the challenging part: developing the algorithms that will form the backbone for classification and similarity detection. We will use Graph Edit Distance (GED) to quantify how dissimilar two graphs are by measuring the cost of transforming one graph into another. To classify a new, unknown graph, we will apply k-Nearest Neighbors (KNN) to identify the most common label among the closest graphs in a labeled dataset. Additionally, we will use Minimum Spanning Tree (MST) comparisons as a faster, approximate method to compare graph features without computing the full GED, enabling quicker similarity assessments when needed.
 
@@ -234,8 +234,10 @@ While the term "alpha" originally relates to pixel transparency, here it symboli
 This naming reflects how the method leverages pixel-level likelihoods to enhance the detection and comparison of water quality through graph similarity.
 
 
-# References
+## Conclusion
+Thank you for taking the time to read through my detailed project description. I felt it was important to explain some of the complex concepts I worked hard on, and hopefully, this will help some future reader who might be struggling with similar challenges. Writing this has also been excellent practice for documenting my projects—I believe this is my first publicly shared one. While I did have a group involved in the project, their contribution was mainly limited to the ADT construction and MST calculations. The rest of the work, however, was crafted entirely by yours truly.
 
+# References
 ## Data Structures and Algorithms
 Goodrich, M.T., Tamassia, R. and Goldwasser, M.H., *Data Structures and Algorithms in Java™*. 6th ed. Hoboken, NJ: Wiley.
 ## Robin Hood Hashing
