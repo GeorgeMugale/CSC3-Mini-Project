@@ -33,7 +33,9 @@
   - [Similarity](#similarity)
     - [Weighted votes](#weighted-votes)
     - [Alpha based Similarity Detection](#alpha-based-similarity-detection)
-  - [Conclusion](#conclusion)
+- [Conclusion](#conclusion)
+- [How to Compile and Run the Program](#how-to-compile-and-run-the-program)
+- [Results](#results)
 - [References](#references)
   - [Data Structures and Algorithms](#data-structures-and-algorithms)
   - [Robin Hood Hashing](#robin-hood-hashing)
@@ -234,8 +236,30 @@ While the term "alpha" originally relates to pixel transparency, here it symboli
 This naming reflects how the method leverages pixel-level likelihoods to enhance the detection and comparison of water quality through graph similarity.
 
 
-## Conclusion
-Thank you for taking the time to read through my detailed project description. I felt it was important to explain some of the complex concepts I worked hard on, and hopefully, this will help some future reader who might be struggling with similar challenges. Writing this has also been excellent practice for documenting my projects—I believe this is my first publicly shared one. While I did have a group involved in the project, their contribution was mainly limited to the ADT construction and MST calculations. The rest of the work, however, was crafted entirely by yours truly.
+# Conclusion
+Thank you for taking the time to read through my detailed project description. I felt it was important to explain some of the complex concepts I worked hard on, and hopefully, this will help some future reader who might be struggling with similar challenges. Writing this has also been excellent practice for documenting my projects—I believe this is my first publicly shared one. While I did have a group involved in the project, their contribution was mainly limited to the ADT construction and MST calculations. The rest of the work, however, was crafted entirely by yours truly. 
+
+# How to Compile and Run the Program
+
+To run the **WaterQualityAnalyzer** program, follow these steps:
+
+1. **Install Java 21**  
+   Ensure that Java 21 is installed on your system and properly set in your environment variables.
+
+2. **Download JavaFX**  
+   You must have JavaFX installed. Download it from the [official website](https://openjfx.io/).
+
+3. **Run the Program**  
+   Use the following command to run the program, replacing `"Path to javafx lib"` with the path to the `lib` folder of your JavaFX installation:
+
+   ```bash
+   java --module-path "Path to javafx lib" --add-modules javafx.controls,javafx.fxml -jar WaterQualityAnalyzer.jar
+
+# Results
+The images bellow are the results of running our program.
+[!result 1](./Project/image1.png)
+[!result 2](./Project/image2.png)
+[!result 3](./Project/image3.png)
 
 # References
 ## Data Structures and Algorithms
